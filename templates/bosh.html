@@ -1,0 +1,40 @@
+{% extends "bootstrap/base.html" %}
+{% block title %} BOSH Tasks{% endblock %}
+{% block content %}
+<div class="col-md-8 offset-md-2">
+  <h1>Fetch BOSH logs</h1>
+    <form class="form form-horizontal" method="POST" action="">
+      {{ form.csrf_token }}
+      <div class="form-row">
+	<div class="form-group col-md-6">
+	  {{ form.deployment.label }}
+	  <select class="form-control"  id={{ form.deployment }}>
+	    {% for d in deployments %}
+	    <option>{{ d }}</option>
+	    {% endfor %}
+	  </select>
+	</div>
+	<div class="form-group col-md-6">
+	  {{ form.jobs.label }}
+	  {{ form.jobs(class="form-control") }}
+	</div>
+	<div class="form-group col-md-6">
+	  <button type="submit" class="btn btn-primary">Submit</button>
+	</div>
+      </div>
+    </form>
+</div>
+<div class="col-md-8 offset-md-2">
+  <form action="download" method="post">
+    <table class="table table-striped table-bordered">
+      <thead><tr><th>Type</th><th>Query</th><th>Task ID</th><th>Download</th></tr></thead>
+      <tbody)
+	{% for task in tasks %}
+	<tr><td>{{ task.t_type }}</td><td>{{ task.t_query }}</td><td>{{ task.t_url }}</td>
+	  <td><a href="bosh/{{ task.t_url }}" download="{{task.t_url|replace('/','')}}.tar.gz">fetch</a></tr>
+	{% endfor %}
+     </tbody>
+    </table>
+   </form>
+</div>
+{% endblock %}

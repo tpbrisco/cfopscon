@@ -17,6 +17,7 @@ scheduler = APScheduler()
 scheduler.init_app(app)
 scheduler.start()
 
+
 @app.route("/index.html")
 @app.route("/")
 def index():

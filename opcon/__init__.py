@@ -1,6 +1,6 @@
 
 # for gunicorn
-import app
+from . import app
 
 
 def application():

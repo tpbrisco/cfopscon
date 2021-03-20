@@ -1,4 +1,7 @@
 {% extends "bootstrap/base.html" %}
+{% block script %}
+
+{% endblock %}
 {% block title %} BOSH Tasks{% endblock %}
 {% block content %}
 <div class="col-md-8 offset-md-2">
@@ -14,7 +17,7 @@
 	    {% endfor %}
 	  </select>
 	</div>
-	<div class="form-group col-md-6">
+	<div class="form-group col-md-6" id={{ form.jobs}} >
 	  {{ form.jobs.label }}
 	  {{ form.jobs(class="form-control") }}
 	</div>

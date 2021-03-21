@@ -28,16 +28,26 @@ ran from the desktop (assuming access to the BOSH director is
 possible), however it does run under gunicorn to support the cf-push
 model of deployment.  For the moment, a simple
 ```bash
-FLASK_APP='opcon.app:app' flask run
+% FLASK_APP='opcon.app:app' flask run
 ```
 should result in a running system, accessible from localhost:5000.
 
 Or, for more production use-cases
 ```bash
-gunicorn -c gunicorn.py 'opcon.app:app'
+% gunicorn -c gunicorn.py 'opcon.app:app'
+```
+
+Or, for cloud foundry foundations
+```bash
+% cf push -f manifestlyml
 ```
 
 ## TO DO
 - Implement authentication for access to the system
+  Should support "fake_auth" (local CSV?), UAA auth, and maybe
+  3rd-party OAuth2 endpoints.
 - Implement auto-fill for BOSH deployment jobs
+  Presumably jQuery, and use the /deployments/:deployment/instances API
+- Investigate and support bosh-cli-like syntax "bosh logs compute" for
+  logs from all "compute" jobs.
 

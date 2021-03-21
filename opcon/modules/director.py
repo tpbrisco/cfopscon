@@ -170,3 +170,17 @@ class Director(object):
         # get blobstore ID from 'result' field
         download_url = "/resources/{}".format(logs_t_r.json()['result'])
         return download_url
+
+    def get_job_history(self, limit):
+        '''get task histories'''
+        if limit:
+            params = {'limit': limit}
+        else:
+            params = {}
+        task_h_r = self.session.get(self.bosh_url + '/tasks',
+                                    params=params,
+                                    verify=self.verify_tls)
+        if task_h_r.ok:
+            return task_h_r.json()
+        else:
+            return {}

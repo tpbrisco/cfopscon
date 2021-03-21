@@ -73,6 +73,14 @@ def get_deployment_jobs(deployment):
                     content_type='application/json')
 
 
+@app.route("/bosh/tasks", methods=['GET'])
+def get_tasks():
+    limit = request.args.get('limit', default=0, type=int)
+    # return Response(director.get_job_history(limit),
+    #                 content_type='application/json')
+    return render_template('bosh_history.html',
+                           tasks=director.get_job_history(limit))
+
 # main configuration dictionary
 config = dict()
 

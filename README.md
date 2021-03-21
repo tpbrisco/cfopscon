@@ -31,9 +31,10 @@ model of deployment.  For the moment, a simple
 FLASK_APP='opcon.app:app' flask run
 ```
 should result in a running system, accessible from localhost:5000.
+
 Or, for more production use-cases
 ```bash
-gunicorn -c gunicory.py 'opcon.app:app'
+gunicorn -c gunicorn.py 'opcon.app:app'
 ```
 
 ## TO DO

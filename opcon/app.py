@@ -35,6 +35,8 @@ def bosh_logs():
         form = boshforms.BoshLogsForm(request.form)
         if form.validate_on_submit():
             director.submit_logs_job(form.deployment.data, form.jobs.data)
+        else:
+            print("form.errors:", form.errors)
         return render_template('bosh.html',
                                form=boshforms.BoshLogsForm(),
                                deployments=director.deployments,
@@ -116,8 +118,8 @@ if not is_gunicorn:
 
 if config['o_debug']:
     print("Configuration:")
-for k in config:
-    print(f'\t{k}: {config[k]}')
+    for k in config:
+        print(f'\t{k}: {config[k]}')
 
 director = director.Director(config['o_director_url'],
                              config['o_bosh_user'], config['o_bosh_pass'],

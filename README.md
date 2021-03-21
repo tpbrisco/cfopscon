@@ -43,10 +43,10 @@ Or, for cloud foundry foundations
 ```
 
 ## TO DO
-- Implement authentication for access to the system
+- Implement authentication for access to the system; 
   Should support "fake_auth" (local CSV?), UAA auth, and maybe
   3rd-party OAuth2 endpoints.
-- Implement auto-fill for BOSH deployment jobs
+- Implement auto-fill for BOSH deployment jobs;
   Presumably jQuery, and use the /deployments/:deployment/instances API
 - Investigate and support bosh-cli-like syntax "bosh logs compute" for
   logs from all "compute" jobs.

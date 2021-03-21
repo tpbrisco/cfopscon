@@ -34,6 +34,5 @@ should result in a running system, accessible from localhost:5000.
 
 ## TO DO
 - Implement authentication for access to the system
-- Implement Flask-nav navigational headers
 - Implement auto-fill for BOSH deployment jobs
 

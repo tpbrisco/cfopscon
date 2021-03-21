@@ -131,4 +131,4 @@ scheduler.add_job(id='oauth-refresh',
                   seconds=director.oauth_token_expires() - 30)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=config['o_debug'])

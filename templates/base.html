@@ -1,0 +1,16 @@
+{% extends "bootstrap/base.html" %}
+{% block head %}
+{{ super() }}
+<link rel="shortcut icon" href="{{ url_for('static',
+				filename='favicon.ico') }}">
+{% endblock %}
+{% block navbar %}
+<ul class="nav nav-pills">
+  <li class="nav-item">
+    <a class="nav-link active" href="{{ url_for('index') }}">CFOP</a>
+  </li>
+  <li class="nav nav-pills">
+    <a class="nav-link active" href="{{ url_for('bosh_logs') }}">BOSH</a>
+  </li>
+</ul>
+{% endblock %}

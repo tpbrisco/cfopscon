@@ -1,11 +1,6 @@
-{% extends "bootstrap/base.html" %}
-{% block script %}
-
-{% endblock %}
+{% extends "base.html" %}
 {% block title %} BOSH Tasks{% endblock %}
 {% block content %}
-<link rel="shortcut icon"
-    href="{{ url_for('static', filename='favicon.ico') }}">
 <div class="col-md-8 offset-md-2">
   <h1>Fetch BOSH logs</h1>
     <form class="form form-horizontal" method="POST" action="">

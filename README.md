@@ -28,9 +28,13 @@ ran from the desktop (assuming access to the BOSH director is
 possible), however it does run under gunicorn to support the cf-push
 model of deployment.  For the moment, a simple
 ```bash
-python3 opcon/app.py
+FLASK_APP='opcon.app:app' flask run
 ```
 should result in a running system, accessible from localhost:5000.
+Or, for more production use-cases
+```bash
+gunicorn -c gunicory.py 'opcon.app:app'
+```
 
 ## TO DO
 - Implement authentication for access to the system

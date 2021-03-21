@@ -8,13 +8,13 @@
       <div class="form-row">
 	<div class="form-group col-md-6">
 	  {{ form.deployment.label }}
-	  <select class="form-control"  id={{ form.deployment }}>
+	  <select class="form-control">
 	    {% for d in deployments %}
 	    <option>{{ d }}</option>
 	    {% endfor %}
 	  </select>
 	</div>
-	<div class="form-group col-md-6" id={{ form.jobs}} >
+	<div class="form-group col-md-6">
 	  {{ form.jobs.label }}
 	  {{ form.jobs(class="form-control") }}
 	</div>

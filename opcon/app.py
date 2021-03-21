@@ -1,12 +1,17 @@
 
 import configparser
-from optparse import OptionParser
 from opcon.modules import director
 from opcon.modules import boshforms
 from flask import Flask, render_template, request, Response, stream_with_context
 from flask_apscheduler import APScheduler
 from flask_bootstrap import Bootstrap
 import uuid
+import os
+
+# see "is_gunicorn" comments below for confusion with gunicorn
+is_gunicorn = "gunicorn" in os.getenv('SERVER_SOFTWARE', '')
+if not is_gunicorn:
+    from optparse import OptionParser
 
 # set up primary objects
 app = Flask(__name__)
@@ -81,30 +86,33 @@ if 'global' in configini:
     config['o_bosh_pass'] = g.get('pass')
 
 
-# cli options override ini file
-parser = OptionParser()
-parser.add_option('-d', '--debug', dest='debug',
-                  default=config['o_debug'], action='store_true',
-                  help='enable debugging mode')
-parser.add_option('-b', '--bosh-url', dest='bosh_url', default='',
-                  help='indicate https://<ip>:<port> for bosh director')
-parser.add_option('--skip-tls-verification', dest='verify_tls',
-                  default=config['o_verify_tls'], action='store_false',
-                  help='skip TLS/SSL certificate validation')
-parser.add_option('-u', '--user', dest='bosh_user', default='',
-                  help='bosh username')
-parser.add_option('-p', '--pass', '--password', dest='bosh_pass', default='',
-                  help='bosh password')
-(options, args) = parser.parse_args()
+# cli options override ini file, if and only if we're not under gunicorn
+# gunicorn gets very confused about the below - resulting in a "fight"
+# over gunicorn vs. application command-line arguments
+if not is_gunicorn:
+    parser = OptionParser()
+    parser.add_option('-d', '--debug', dest='debug',
+                      default=config['o_debug'], action='store_true',
+                      help='enable debugging mode')
+    parser.add_option('-b', '--bosh-url', dest='bosh_url', default='',
+                      help='indicate https://<ip>:<port> for bosh director')
+    parser.add_option('--skip-tls-verification', dest='verify_tls',
+                      default=config['o_verify_tls'], action='store_false',
+                      help='skip TLS/SSL certificate validation')
+    parser.add_option('-u', '--user', dest='bosh_user', default='',
+                      help='bosh username')
+    parser.add_option('-p', '--pass', '--password', dest='bosh_pass',
+                      default='', help='bosh password')
+    (options, args) = parser.parse_args()
 
-config['o_debug'] = options.debug
-config['o_verify_tls'] = options.verify_tls
-if options.bosh_url:
-    config['o_director_url'] = options.bosh_url
-if options.bosh_user:
-    config['o_bosh_user'] = options.bosh_user
-if options.bosh_pass:
-    config['o_bosh_pass'] = options.bosh_pass
+    config['o_debug'] = options.debug
+    config['o_verify_tls'] = options.verify_tls
+    if options.bosh_url:
+        config['o_director_url'] = options.bosh_url
+    if options.bosh_user:
+        config['o_bosh_user'] = options.bosh_user
+    if options.bosh_pass:
+        config['o_bosh_pass'] = options.bosh_pass
 
 if config['o_debug']:
     print("Configuration:")

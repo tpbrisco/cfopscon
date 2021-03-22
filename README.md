@@ -50,4 +50,5 @@ Or, for cloud foundry foundations
   Presumably jQuery, and use the /deployments/:deployment/instances API
 - Investigate and support bosh-cli-like syntax "bosh logs compute" for
   logs from all "compute" jobs.
-
+- "flash" updates on the status of things in wait;  E.g. waiting on a
+  job to complete for logs download - put a status update.

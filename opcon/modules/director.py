@@ -4,6 +4,7 @@ import sys
 import json
 from urllib.parse import urlparse
 import time
+import hashlib
 
 TASK_LOGS = 1
 task_index = {
@@ -57,10 +58,13 @@ class Director(object):
         '''oauth_token_expires() - return number of seconds until current key expires'''
         return int(self.oauth['expires_in'])
 
+    def __p_hash(self, key):
+        return hashlib.md5(key.encode('ascii')).hexdigest()
+
     def refresh_token(self):
         '''refresh_token: update authorization tokens'''
         if self.debug:
-            print("refreshing token", self.oauth['access_token'][:20], "...")
+            print("refreshing token hash(", self.__p_hash(self.oauth['access_token']), ")")
         r = self.session.post(
             self.uaa_url + '/oauth/token',
             data={'refresh_token': self.oauth['refresh_token'],
@@ -75,7 +79,7 @@ class Director(object):
         j = r.json()
         self.oauth = j.copy()
         if self.debug:
-            print("new token", self.oauth['access_token'][:20], "...")
+            print("new token hash(", self.__p_hash(self.oauth['access_token']), ")")
         self.session.headers.update(
             {'Authorization': j['token_type'] + ' ' + j['access_token']})
 

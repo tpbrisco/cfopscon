@@ -2,6 +2,7 @@
 import configparser
 from opcon.modules import director
 from opcon.modules import boshforms
+from opcon.modules import auth
 from flask import Flask, render_template, request, Response, stream_with_context
 from flask_apscheduler import APScheduler
 from flask_bootstrap import Bootstrap
@@ -21,7 +22,8 @@ app.config['SECRET_KEY'] = uuid.uuid4().hex
 scheduler = APScheduler()
 scheduler.init_app(app)
 scheduler.start()
-
+app.config['USER_AUTH_TYPE'] = 'CSV'
+app.config['USER_AUTH'] = auth.user_authentication(app)
 
 @app.route("/index.html")
 @app.route("/")
@@ -51,13 +53,14 @@ def bosh_logs():
 
 @app.route("/bosh/tasks/<taskid>", methods=['GET'])
 def download_logs(taskid):
+    t = None
     for t in director.pending_tasks:
         if "/tasks/{}".format(taskid) == t.t_url:
             break
     if t is None:
         return Response('Could not find task', 404)
     filename = t.t_query.replace('/', '_').replace(' ', '_') + ".tgz"
-    del t  # remove it from the pending jobs
+    director.pending_tasks.remove(t)
     download_url = director.get_logs_job("/tasks/{}".format(taskid))
     r = director.session.get(director.bosh_url + download_url,
                              verify=director.verify_tls,
@@ -94,7 +97,10 @@ if 'global' in configini:
     config['o_verify_tls'] = g.getboolean('verify_tls', fallback=True)
     config['o_bosh_user'] = g.get('user')
     config['o_bosh_pass'] = g.get('pass')
-
+if 'auth' in configini:
+    a = configini['auth']
+    config['o_auth_type'] = a.get('type')
+    config['o_auth_data'] = a.get('data')
 
 # cli options override ini file, if and only if we're not under gunicorn
 # gunicorn gets very confused about the below - resulting in a "fight"

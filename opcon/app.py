@@ -3,7 +3,7 @@ import configparser
 from opcon.modules import director
 from opcon.modules import boshforms
 from opcon.modules import auth
-from flask import Flask, render_template, request, Response, stream_with_context
+from flask import Flask, render_template, request, Response, stream_with_context, redirect, session, flash
 from flask_apscheduler import APScheduler
 from flask_bootstrap import Bootstrap
 import uuid
@@ -24,11 +24,39 @@ scheduler.init_app(app)
 scheduler.start()
 app.config['USER_AUTH_TYPE'] = 'CSV'
 app.config['USER_AUTH'] = auth.user_authentication(app)
+user_auth = auth.user_authentication(app)
+user_auth.ua_login_manager.init_app(app)
+user_auth.ua_login_manager.login_view = 'login'
+
 
 @app.route("/index.html")
 @app.route("/")
+@user_auth.flask_login_required
 def index():
     return render_template("index.html")
+
+
+@user_auth.ua_login_manager.user_loader
+def load_user(id):
+    return user_auth.user_loader(id)
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if user_auth.flask_current_user.is_authenticated:
+        return redirect('/index.html')
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user_auth.login_user(username, password)
+        return redirect('/index.html')
+    return render_template('login.html')
+
+
+@app.route('/logout')
+def logout():
+    session['logged_in'] = False
+    return redirect('/index.html')
 
 
 @app.route("/bosh", methods=['GET', 'POST'])
@@ -83,6 +111,7 @@ def get_tasks():
     #                 content_type='application/json')
     return render_template('bosh_history.html',
                            tasks=director.get_job_history(limit))
+
 
 # main configuration dictionary
 config = dict()

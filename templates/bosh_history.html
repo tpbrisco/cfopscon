@@ -9,7 +9,7 @@
     <tbody>
       {% for task in tasks %}
       <tr><td>{{ task.id }}</td><td>{{ task.state }}</td><td>{{ task.description }}</td>
-	<td>{{ task.timestamp }}</td>
+	<td>{{ task.timestamp |datetime}}</td>
 	<td>{{ task.result }}</td><td>{{ task.user }}</td>
 	<td>{{ task.deployment }}</td></tr>
       {% endfor %}

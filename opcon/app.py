@@ -8,6 +8,7 @@ from flask_apscheduler import APScheduler
 from flask_bootstrap import Bootstrap
 import uuid
 import os
+import time
 
 # see "is_gunicorn" comments below for confusion with gunicorn
 is_gunicorn = "gunicorn" in os.getenv('SERVER_SOFTWARE', '')
@@ -60,6 +61,7 @@ def logout():
 
 
 @app.route("/bosh", methods=['GET', 'POST'])
+@user_auth.flask_login_required
 def bosh_logs():
     if request.method == 'POST':
         form = boshforms.BoshLogsForm(request.form)
@@ -79,7 +81,13 @@ def bosh_logs():
     return render_template('index.html')
 
 
+@app.template_filter('datetime')
+def format_datetime(value):
+    return time.ctime(value)
+
+
 @app.route("/bosh/tasks/<taskid>", methods=['GET'])
+@user_auth.flask_login_required
 def download_logs(taskid):
     t = None
     for t in director.pending_tasks:
@@ -99,12 +107,14 @@ def download_logs(taskid):
 
 
 @app.route("/bosh/deployment/<deployment>/jobs", methods=['GET'])
+@user_auth.flask_login_required
 def get_deployment_jobs(deployment):
     return Response(director.get_deployment_jobs(deployment),
                     content_type='application/json')
 
 
 @app.route("/bosh/tasks", methods=['GET'])
+@user_auth.flask_login_required
 def get_tasks():
     limit = request.args.get('limit', default=0, type=int)
     # return Response(director.get_job_history(limit),

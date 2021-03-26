@@ -44,7 +44,7 @@ Or, for cloud foundry foundations
 
 ## TO DO
 - Implement authentication for access to the system; 
-  Should support "fake_auth" ( --local CSV?-- ), UAA auth, and maybe
+  Should support "fake_auth" (~~local CSV?~~), UAA auth, and maybe
   3rd-party OAuth2 endpoints.
 - Implement auto-fill for BOSH deployment jobs;
   Presumably jQuery, and use the /deployments/:deployment/instances API

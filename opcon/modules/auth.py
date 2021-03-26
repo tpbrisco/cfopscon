@@ -66,7 +66,6 @@ class user_authentication(object):
 
     def login_user(self, username, password):
         '''initiate user login'''
-        print("login_user({})".format(username))
         if self.user_auth.user_auth(username, password):
             ok_user = User(username)
             ok_user.is_authenticated = True

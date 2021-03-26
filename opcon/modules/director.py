@@ -173,6 +173,8 @@ class Director(object):
         #                                  verify=self.verify_tls)
         # get blobstore ID from 'result' field
         download_url = "/resources/{}".format(logs_t_r.json()['result'])
+        if self.debug:
+            print("downloading logs from blobstore", download_url)
         return download_url
 
     def get_job_history(self, limit):

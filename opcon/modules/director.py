@@ -64,7 +64,7 @@ class Director(object):
     def refresh_token(self):
         '''refresh_token: update authorization tokens'''
         if self.debug:
-            print("refreshing token hash(", self.__p_hash(self.oauth['access_token']), ")")
+            print("refreshing token hash({})".format(self.__p_hash(self.oauth['access_token'])))
         r = self.session.post(
             self.uaa_url + '/oauth/token',
             data={'refresh_token': self.oauth['refresh_token'],
@@ -79,7 +79,7 @@ class Director(object):
         j = r.json()
         self.oauth = j.copy()
         if self.debug:
-            print("new token hash(", self.__p_hash(self.oauth['access_token']), ")")
+            print("new token hash({})".format(self.__p_hash(self.oauth['access_token'])))
         self.session.headers.update(
             {'Authorization': j['token_type'] + ' ' + j['access_token']})
 

@@ -61,8 +61,12 @@ class user_authentication(object):
         if self.ua_type == 'CSV':
             self.user_auth = user_csv('users.csv')
         self.flask_login_required = flask_login.login_required
+        self.flask_logout_user = flask_login.logout_user
         self.flask_current_user = flask_login.current_user
         self.flask_login_user = flask_login.login_user
+
+    def logout_user(self):
+        self.flask_logout_user()
 
     def login_user(self, username, password):
         '''initiate user login'''

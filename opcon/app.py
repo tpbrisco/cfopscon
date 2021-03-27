@@ -57,6 +57,7 @@ def login():
 @app.route('/logout')
 def logout():
     session['logged_in'] = False
+    user_auth.logout_user()
     return redirect('/index.html')
 
 

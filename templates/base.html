@@ -6,17 +6,19 @@
 {% endblock %}
 {% block navbar %}
 <ul class="nav nav-pills">
-  <li class="nav-item">
-    <a class="nav-link active" href="{{ url_for('index') }}">CFOP</a>
-  </li>
-  <li class="nav nav-pills">
-    <a class="nav-link active" href="{{ url_for('bosh_logs') }}">BOSH</a>
-  </li>
-  <li class="nav nav-pills">
-    <a class="nav-link active" href="{{ url_for('get_tasks')}}">Tasks</a>
-  <li>
-  <li class="nav nav-pills">
-    <a class="nav-link active" href="{{ url_for('logout') }}">Logout</a>
-  </li>
+    <li class="nav nav-pills">
+      <a class="nav-link active" href="{{ url_for('index') }}">CFOP</a>
+    </li>
+    <li class="dropdown">
+      <a class="dropdown-toggle" data-toggle="dropdown" href="#">BOSH Actions</a>
+      <ul class="dropdown-menu">
+	<li><a href="{{ url_for('bosh_logs') }}">Logs</a></li>
+	<li><a href="{{ url_for('get_tasks') }}">Tasks</a></li>
+      </ul>
+    </li>
+    </li>
+    <li class="nav nav-pills">
+      <a class="nav-link active" href="{{ url_for('logout') }}">Logout</a>
+    </li>
 </ul>
 {% endblock %}

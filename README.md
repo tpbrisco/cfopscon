@@ -46,8 +46,8 @@ Or, for cloud foundry foundations
 - Implement authentication for access to the system; 
   Should support "fake_auth" (~~local CSV?~~), UAA auth, and maybe
   3rd-party OAuth2 endpoints.
-- Implement auto-fill for BOSH deployment jobs;
-  Presumably jQuery, and use the /deployments/:deployment/instances API
+- ~~Implement auto-fill for BOSH deployment jobs;
+  Presumably jQuery, and use the /deployments/:deployment/instances API~~
 - Investigate and support bosh-cli-like syntax "bosh logs compute" for
   logs from all "compute" jobs.
 - "flash" updates on the status of things in wait;  E.g. waiting on a

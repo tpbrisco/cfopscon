@@ -3,6 +3,7 @@ import configparser
 from opcon.modules import director
 from opcon.modules import boshforms
 from opcon.modules import auth
+from opcon.modules import config
 from flask import Flask, render_template, request, Response, stream_with_context, redirect, session, flash
 from flask_apscheduler import APScheduler
 from flask_bootstrap import Bootstrap
@@ -100,7 +101,7 @@ def download_logs(taskid):
     if t is None:
         return Response('Could not find task', 404)
     filename = t.t_query.replace('/', '_').replace(' ', '_') + ".tgz"
-    director.pending_tasks.remove(t)
+    # director.pending_tasks.remove(t)
     download_url = director.get_logs_job("/tasks/{}".format(taskid))
     r = director.session.get(director.bosh_url + download_url,
                              verify=director.verify_tls,
@@ -128,60 +129,13 @@ def get_tasks():
 
 
 # main configuration dictionary
-config = dict()
+config = config.config(command_line=not is_gunicorn, config_file='opcon.ini')
 
-# parse base configuration file
-configini = configparser.ConfigParser()
-configini.read('opcon.ini')
-if 'global' in configini:
-    g = configini['global']
-    config['o_debug'] = g.getboolean('debug', fallback=False)
-    config['o_director_url'] = g.get('director_url')
-    config['o_verify_tls'] = g.getboolean('verify_tls', fallback=True)
-    config['o_bosh_user'] = g.get('user')
-    config['o_bosh_pass'] = g.get('pass')
-if 'auth' in configini:
-    a = configini['auth']
-    config['o_auth_type'] = a.get('type')
-    config['o_auth_data'] = a.get('data')
-
-# cli options override ini file, if and only if we're not under gunicorn
-# gunicorn gets very confused about the below - resulting in a "fight"
-# over gunicorn vs. application command-line arguments
-if not is_gunicorn:
-    parser = OptionParser()
-    parser.add_option('-d', '--debug', dest='debug',
-                      default=config['o_debug'], action='store_true',
-                      help='enable debugging mode')
-    parser.add_option('-b', '--bosh-url', dest='bosh_url', default='',
-                      help='indicate https://<ip>:<port> for bosh director')
-    parser.add_option('--skip-tls-verification', dest='verify_tls',
-                      default=config['o_verify_tls'], action='store_false',
-                      help='skip TLS/SSL certificate validation')
-    parser.add_option('-u', '--user', dest='bosh_user', default='',
-                      help='bosh username')
-    parser.add_option('-p', '--pass', '--password', dest='bosh_pass',
-                      default='', help='bosh password')
-    (options, args) = parser.parse_args()
-
-    config['o_debug'] = options.debug
-    config['o_verify_tls'] = options.verify_tls
-    if options.bosh_url:
-        config['o_director_url'] = options.bosh_url
-    if options.bosh_user:
-        config['o_bosh_user'] = options.bosh_user
-    if options.bosh_pass:
-        config['o_bosh_pass'] = options.bosh_pass
-
-if config['o_debug']:
-    print("Configuration:")
-    for k in config:
-        print(f'\t{k}: {config[k]}')
-
-director = director.Director(config['o_director_url'],
-                             config['o_bosh_user'], config['o_bosh_pass'],
-                             debug=config['o_debug'],
-                             verify_tls=config['o_verify_tls'])
+director = director.Director(config.get('o_director_url'),
+                             config.get('o_bosh_user'),
+                             config.get('o_bosh_pass'),
+                             debug=config.get('o_debug'),
+                             verify_tls=config.get('o_verify_tls'))
 print("scheduled oauth update in %d seconds" % (
     director.oauth_token_expires() - 30))
 scheduler.add_job(id='oauth-refresh',

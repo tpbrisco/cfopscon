@@ -9,6 +9,7 @@ from flask_bootstrap import Bootstrap
 import uuid
 import os
 import time
+import json
 
 # see "is_gunicorn" comments below for confusion with gunicorn
 is_gunicorn = "gunicorn" in os.getenv('SERVER_SOFTWARE', '')
@@ -73,11 +74,13 @@ def bosh_logs():
         return render_template('bosh.html',
                                form=boshforms.BoshLogsForm(),
                                deployments=director.deployments,
+                               jobs=json.loads(director.get_deployment_jobs(director.deployments[0])),
                                tasks=director.pending_tasks)
     elif request.method == 'GET':
         return render_template('bosh.html',
                                form=boshforms.BoshLogsForm(),
                                deployments=director.deployments,
+                               jobs=json.loads(director.get_deployment_jobs(director.deployments[0])),
                                tasks=director.pending_tasks)
     return render_template('index.html')
 

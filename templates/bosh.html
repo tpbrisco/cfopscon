@@ -1,6 +1,20 @@
 {% extends "base.html" %}
 {% block title %} BOSH Tasks{% endblock %}
 {% block content %}
+<script src="{{bootstrap_find_resource('jquery.js', cdn='jquery')}}"></script>
+<script>
+  $(document).ready(function() {
+      $("#deployment_list").click(function(){
+	  // alert("deployment: " + $("#deployment_list").val());
+	  $.get("/bosh/deployment/" + $("#deployment_list").val() + "/jobs", function(data, status){
+	      $("#deployment_jobs").empty("li");
+	      for (i=0; i < data.length; i++) {
+		  $("#deployment_jobs").append("<option>"+data[i]+"</option>");
+	      }
+	  })
+      })
+  })
+</script>
 <div class="col-md-8 offset-md-2">
   <h1>Fetch BOSH logs</h1>
     <form class="form form-horizontal" method="POST" action="">
@@ -8,7 +22,7 @@
       <div class="form-row">
 	<div class="form-group col-md-6">
 	  {{ form.deployment.label }}
-	  <select class="form-control" id={{ form.deployment }}>
+	  <select class="form-control"  id="deployment_list" name="deployment">
 	    {% for d in deployments %}
 	    <option>{{ d }}</option>
 	    {% endfor %}
@@ -16,7 +30,12 @@
 	</div>
 	<div class="form-group col-md-6">
 	  {{ form.jobs.label }}
-	  {{ form.jobs(class="form-control") }}
+	  <select class="form-control" id="deployment_jobs" name="jobs">
+	    <!-- {{ jobs }} -->
+	    {% for j in jobs %}
+	    <option>{{ j }}</option>
+	    {% endfor %}
+	  </select>
 	</div>
 	<div class="form-group col-md-6">
 	  <button type="submit" class="btn btn-primary">Submit</button>

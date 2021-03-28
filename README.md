@@ -52,3 +52,4 @@ Or, for cloud foundry foundations
   logs from all "compute" jobs.
 - "flash" updates on the status of things in wait;  E.g. waiting on a
   job to complete for logs download - put a status update.
+- home page statistics -- include "interesting" stats about BOSH, CF

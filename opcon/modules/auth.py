@@ -59,7 +59,11 @@ class user_authentication(object):
         self.ua_type = app.config['USER_AUTH_TYPE']
         self.ua_login_manager = LoginManager()
         if self.ua_type == 'CSV':
-            self.user_auth = user_csv('users.csv')
+            self.user_auth = user_csv(app.config['USER_AUTH_DATA'])
+        else:
+            # handle "no authentication type defined"
+            sys.stderr.write("No valid authentication scheme selected\n")
+            sys.exit(1)
         self.flask_login_required = flask_login.login_required
         self.flask_logout_user = flask_login.logout_user
         self.flask_current_user = flask_login.current_user

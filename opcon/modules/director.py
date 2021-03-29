@@ -21,6 +21,7 @@ class task_logs(object):
         self.t_url = task_url
         self.t_try_count = 0
         self.t_results_code = 0
+        self.t_time = int(time.time())
 
     def __repr__(self):
         return "%s:%s" % (task_index[self.t_type], self.t_url)

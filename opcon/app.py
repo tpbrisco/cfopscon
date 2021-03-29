@@ -1,21 +1,24 @@
 
-import configparser
 from opcon.modules import director
 from opcon.modules import boshforms
 from opcon.modules import auth
 from opcon.modules import config
-from flask import Flask, render_template, request, Response, stream_with_context, redirect, session, flash
+from flask import Flask, render_template, request, Response, redirect, session, flash
 from flask_apscheduler import APScheduler
 from flask_bootstrap import Bootstrap
 import uuid
 import os
+import sys
 import time
 import json
 
 # see "is_gunicorn" comments below for confusion with gunicorn
+# gunicorn gets very confused with command-line parsing options, even if
+# unused. it appears the optparse library is stepped all over between the
+# application and gunicorn libraries.
+# "is_gunicorn" is used to disable the main application parsing (or even
+# loading the optparse library)
 is_gunicorn = "gunicorn" in os.getenv('SERVER_SOFTWARE', '')
-if not is_gunicorn:
-    from optparse import OptionParser
 
 # set up primary objects
 app = Flask(__name__)
@@ -25,8 +28,15 @@ app.config['SECRET_KEY'] = uuid.uuid4().hex
 scheduler = APScheduler()
 scheduler.init_app(app)
 scheduler.start()
-app.config['USER_AUTH_TYPE'] = 'CSV'
-app.config['USER_AUTH'] = auth.user_authentication(app)
+
+# main configuration dictionary
+config = config.config(command_line=not is_gunicorn, config_file='opcon.ini')
+if config.get('o_debug'):
+    app.config['DEBUG'] = config.get('o_debug')
+if config.get('o_auth_type'):
+    app.config['USER_AUTH_TYPE'] = config.get('o_auth_type')
+    app.config['USER_AUTH_DATA'] = config.get('o_auth_data')
+
 user_auth = auth.user_authentication(app)
 user_auth.ua_login_manager.init_app(app)
 user_auth.ua_login_manager.login_view = 'login'
@@ -46,13 +56,16 @@ def load_user(id):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    next = request.args.get('next')
+    if not next and not next.startswith('http'):
+        next = Flask.url_for('index')
     if user_auth.flask_current_user.is_authenticated:
-        return redirect('/index.html')
+        return redirect(next)
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         user_auth.login_user(username, password)
-        return redirect('/index.html')
+        return redirect(next)
     return render_template('login.html')
 
 
@@ -60,7 +73,7 @@ def login():
 def logout():
     session['logged_in'] = False
     user_auth.logout_user()
-    return redirect('/index.html')
+    return redirect(Flask.url_for('index'))
 
 
 @app.route("/bosh", methods=['GET', 'POST'])
@@ -71,7 +84,7 @@ def bosh_logs():
         if form.validate_on_submit():
             director.submit_logs_job(form.deployment.data, form.jobs.data)
         else:
-            print("form.errors:", form.errors)
+            sys.stderr.write("form.errors:{}\n".format(form.errors))
         return render_template('bosh.html',
                                form=boshforms.BoshLogsForm(),
                                deployments=director.deployments,
@@ -86,6 +99,7 @@ def bosh_logs():
     return render_template('index.html')
 
 
+# add jinja template for converting "Epoch" dates to time strings
 @app.template_filter('datetime')
 def format_datetime(value):
     return time.ctime(value)
@@ -106,7 +120,7 @@ def download_logs(taskid):
     r = director.session.get(director.bosh_url + download_url,
                              verify=director.verify_tls,
                              stream=True)
-    return Response(stream_with_context(r.iter_content(chunk_size=512 * 1024)),
+    return Response(Flask.stream_with_context(r.iter_content(chunk_size=512 * 1024)),
                     content_type='application/gzip',
                     headers={'Content-Disposition': "attachment; filename={}".format(filename)})
 
@@ -127,9 +141,6 @@ def get_tasks():
     return render_template('bosh_history.html',
                            tasks=director.get_job_history(limit))
 
-
-# main configuration dictionary
-config = config.config(command_line=not is_gunicorn, config_file='opcon.ini')
 
 director = director.Director(config.get('o_director_url'),
                              config.get('o_bosh_user'),

@@ -1,5 +1,6 @@
 # cfopscon
 The Cloud Foundry Operator's Console
+![image of console](assets/console.png)
 
 The CF Operator's Console is intended to reduce toil for many common
 cloud operator tasks (e.g. obtaining and downloading logs).  It

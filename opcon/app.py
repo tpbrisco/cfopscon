@@ -46,7 +46,8 @@ user_auth.ua_login_manager.login_view = 'login'
 @app.route("/")
 @user_auth.flask_login_required
 def index():
-    return render_template("index.html", director=director)
+    return render_template("index.html", director=director,
+                           stats=director.get_director_stats())
 
 
 @user_auth.ua_login_manager.user_loader

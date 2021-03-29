@@ -1,7 +1,6 @@
 import requests
 import urllib3
 import sys
-import json
 from urllib.parse import urlparse
 import time
 import hashlib
@@ -102,6 +101,13 @@ class Director(object):
         # update auth headers in persisted session
         self.session.headers.update({'Authorization': j['token_type'] + ' ' + j['access_token']})
 
+    def get_director_stats(self):
+        '''get key statistics about the system'''
+        stats = dict()
+        for d in self.deployments:
+            stats[d] = len(self.get_deployment_jobs(d))
+        return stats
+
     def get_deployments(self):
         '''get a list of deployments on this director'''
         d_r = self.session.get(self.bosh_url + "/deployments",
@@ -128,7 +134,7 @@ class Director(object):
         if j_r.ok:
             for j in j_r.json():
                 r.append("{}/{}".format(j['job'], j['id']))
-            return json.dumps(r, indent=2)
+            return r
         else:
             return list()
 

@@ -88,13 +88,13 @@ def bosh_logs():
         return render_template('bosh.html',
                                form=boshforms.BoshLogsForm(),
                                deployments=director.deployments,
-                               jobs=json.loads(director.get_deployment_jobs(director.deployments[0])),
+                               jobs=director.get_deployment_jobs(director.deployments[0]),
                                tasks=director.pending_tasks)
     elif request.method == 'GET':
         return render_template('bosh.html',
                                form=boshforms.BoshLogsForm(),
                                deployments=director.deployments,
-                               jobs=json.loads(director.get_deployment_jobs(director.deployments[0])),
+                               jobs=director.get_deployment_jobs(director.deployments[0]),
                                tasks=director.pending_tasks)
     return render_template('index.html')
 
@@ -128,7 +128,7 @@ def download_logs(taskid):
 @app.route("/bosh/deployment/<deployment>/jobs", methods=['GET'])
 @user_auth.flask_login_required
 def get_deployment_jobs(deployment):
-    return Response(director.get_deployment_jobs(deployment),
+    return Response(json.dumps(director.get_deployment_jobs(deployment)),
                     content_type='application/json')
 
 

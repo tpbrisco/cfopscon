@@ -3,12 +3,13 @@ from opcon.modules import director
 from opcon.modules import boshforms
 from opcon.modules import auth
 from opcon.modules import config
-from flask import  (
+from flask import (
     Flask,
     render_template,
     request,
     Response,
     redirect,
+    stream_with_context,
     session,
     flash
 )
@@ -129,7 +130,7 @@ def download_logs(taskid):
     r = director.session.get(director.bosh_url + download_url,
                              verify=director.verify_tls,
                              stream=True)
-    return Response(Flask.stream_with_context(r.iter_content(chunk_size=512 * 1024)),
+    return Response(stream_with_context(r.iter_content(chunk_size=512 * 1024)),
                     content_type='application/gzip',
                     headers={'Content-Disposition': "attachment; filename={}".format(filename)})
 

@@ -3,7 +3,15 @@ from opcon.modules import director
 from opcon.modules import boshforms
 from opcon.modules import auth
 from opcon.modules import config
-from flask import Flask, render_template, request, Response, redirect, session, flash
+from flask import  (
+    Flask,
+    render_template,
+    request,
+    Response,
+    redirect,
+    session,
+    flash
+)
 from flask_apscheduler import APScheduler
 from flask_bootstrap import Bootstrap
 import uuid

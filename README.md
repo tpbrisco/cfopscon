@@ -45,12 +45,15 @@ Or, for cloud foundry foundations
 
 ## TO DO
 - Implement authentication for access to the system; 
-  Should support "fake_auth" (~~local CSV?~~), UAA auth, and maybe
+  Should support "fake_auth" (~~local CSV?~~), ~~UAA auth~~, and maybe
   3rd-party OAuth2 endpoints.
+- show VM health state (bosh vms --vitals)
+- recreate specific VMs
+- home page statistics -- include "interesting" stats about BOSH, CF
 - ~~Implement auto-fill for BOSH deployment jobs;
-  Presumably jQuery, and use the /deployments/:deployment/instances API~~
 - Investigate and support bosh-cli-like syntax "bosh logs compute" for
   logs from all "compute" jobs.
 - "flash" updates on the status of things in wait;  E.g. waiting on a
   job to complete for logs download - put a status update.
-- home page statistics -- include "interesting" stats about BOSH, CF
+  Presumably jQuery, and use the /deployments/:deployment/instances API~~
+- restart CF brokers

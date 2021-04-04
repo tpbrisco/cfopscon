@@ -4,6 +4,7 @@ import sys
 from urllib.parse import urlparse
 import time
 import hashlib
+import json
 
 TASK_LOGS = 1
 task_index = {
@@ -198,3 +199,55 @@ class Director(object):
             return task_h_r.json()
         else:
             return {}
+
+    def get_deployment_vitals(self, deployment):
+        '''get bosh vms --vitals'''
+        if deployment not in self.deployments:
+            return None
+        # deployments/<deployment>/instances?format=full
+        vitals_url = '%s/deployments/%s/instances' % (
+            self.bosh_url, deployment)
+        if self.debug:
+            print("submit for instance vitals", vitals_url)
+        vitals_resp = self.session.get(vitals_url, params={'format': 'full'},
+                                       allow_redirects=False,
+                                       verify=self.verify_tls)
+        if not vitals_resp.status_code == 302:
+            print("error calling bosh:", vitals_resp.content)
+            return None
+        vitals_task_url = urlparse(vitals_resp.headers['Location']).path
+        if self.debug:
+            print("vitals task:", vitals_task_url)
+        vitals_t_r = self.session.get(self.bosh_url + vitals_task_url,
+                                      verify=self.verify_tls)
+        task_state = vitals_t_r.json()['state']
+        while task_state != 'done':
+            # should "flash" a message here
+            if self.debug:
+                print("vitals state: sleep until job ready")
+            time.sleep(1)
+            vitals_t_r = self.session.get(self.bosh_url + vitals_task_url,
+                                          verify=self.verify_tls)
+            task_state = vitals_t_r.json()['state']
+        if self.debug:
+            print("vitals state: job is ready")
+        # get output from task -- this is tricky
+        # the output from the task is a series of json-as-text strings (one
+        # object per line),  so read that, convert it into dictionary, and
+        # append that to a list we can then take that list-of-dicts and return
+        # it as a reasonable answer.
+        # All this instead of a response.json() call - because it's not json...
+        if self.debug:
+            print("vitals output", self.bosh_url + vitals_task_url + '/output')
+        vitals_t_r = self.session.get(self.bosh_url + vitals_task_url + '/output',
+                                      params={'type': 'result'},
+                                      verify=self.verify_tls)
+        my_data = vitals_t_r.content.decode('ascii')  # convert \n to newline
+        ary_vms = list()
+        for i in my_data.splitlines():
+            ary_vms.append(json.loads(i))
+        if self.debug:
+            print("received data dumped to /tmp/response.json")
+            with open('/tmp/response.json', 'w') as f:
+                f.write(json.dumps(ary_vms))
+        return ary_vms

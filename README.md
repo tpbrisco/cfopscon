@@ -50,7 +50,7 @@ Or, for cloud foundry foundations
 - recreate specific VMs
 - home page statistics -- include "interesting" stats about BOSH, CF
 - ~~show VM health state (bosh vms --vitals)~~
-- ~~Implement auto-fill for BOSH deployment jobs;
+- ~~Implement auto-fill for BOSH deployment jobs~~
 - Investigate and support bosh-cli-like syntax "bosh logs compute" for
   logs from all "compute" jobs.
 - "flash" updates on the status of things in wait;  E.g. waiting on a

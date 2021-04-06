@@ -66,17 +66,32 @@ def load_user(id):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    next = request.args.get('next')
-    if not next and not next.startswith('http'):
-        next = Flask.url_for('index')
-    if user_auth.flask_current_user.is_authenticated:
-        return redirect(next)
+    if app.config['USER_AUTH_TYPE'] == 'CSV':
+        next = request.args.get('next')
+        if not next and not next.startswith('http'):
+            next = Flask.url_for('index')
+        if user_auth.flask_current_user.is_authenticated:
+            return redirect(next)
+        if request.method == 'POST':
+            username = request.form['username']
+            password = request.form['password']
+            user_auth.login_user(username, password)
+            return redirect(next)
+        return render_template('login_csv.html')
+    elif app.config['USER_AUTH_TYPE'] == 'UAA':
+        return render_template("login_uaa.html",
+                               cf_login=user_auth.user_auth.auth_url)
+    else:
+        return render_template('login_csv.html')
+
+
+@app.route('/login_redirect', methods=['GET', 'POST'])
+def login_redirect():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        user_auth.login_user(username, password)
-        return redirect(next)
-    return render_template('login.html')
+        print("request POST args: {}".format(request.form))
+    elif request.method == 'GET':
+        print("request GET args: {}".format(request.args))
+    return Response('isallright', 200)
 
 
 @app.route('/logout')
@@ -133,6 +148,19 @@ def download_logs(taskid):
     return Response(stream_with_context(r.iter_content(chunk_size=512 * 1024)),
                     content_type='application/gzip',
                     headers={'Content-Disposition': "attachment; filename={}".format(filename)})
+
+
+@app.route("/bosh/deployment/vitals", methods=['GET'])
+@user_auth.flask_login_required
+def get_deployment_vitals_default():
+    deployment = request.args.get('deployment')
+    if deployment is None:
+        deployment = director.deployments[0]
+    vitals = director.get_deployment_vitals(deployment)
+    return render_template('bosh_vitals.html',
+                           deployment_name=deployment,
+                           deployments=director.deployments,
+                           deployment_vitals=vitals)
 
 
 @app.route("/bosh/deployment/<deployment>/jobs", methods=['GET'])

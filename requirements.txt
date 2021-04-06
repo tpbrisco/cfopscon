@@ -1,9 +1,9 @@
-APScheduler==3.7.0
-Flask==1.1.2
-Flask-APScheduler==1.11.0
-Flask-Bootstrap==3.3.7.1
-Flask-WTF==0.14.3
+APScheduler
+Flask
+Flask-APScheduler
+Flask-Bootstrap
+Flask-WTF
 flask_login
-WTForms==2.3.3
+WTForms
 requests
 gunicorn

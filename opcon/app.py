@@ -153,18 +153,8 @@ def download_logs(taskid):
 @app.route("/bosh/deployment/vitals", methods=['GET'])
 @user_auth.flask_login_required
 def get_deployment_vitals_default():
-    return get_deployment_vitals(director.deployments[0])
-    # vitals = director.get_deployment_vitals(director.deployments[0])
-    # return render_template('bosh_vitals.html',
-    #                        deployment_name=director.deployments[0],
-    #                        deployments=director.deployments,
-    #                        deployment_vitals=vitals
-
-@app.route("/bosh/deployment/<deployment>/vitals", methods=['GET'])
-@user_auth.flask_login_required
-def get_deployment_vitals(deployment):
-    # return rendered template with data
-    if deployment == "":
+    deployment = request.args.get('deployment')
+    if deployment is None:
         deployment = director.deployments[0]
     vitals = director.get_deployment_vitals(deployment)
     return render_template('bosh_vitals.html',

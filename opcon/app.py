@@ -11,7 +11,8 @@ from flask import (
     redirect,
     stream_with_context,
     session,
-    flash
+    flash,
+    url_for
 )
 from flask_apscheduler import APScheduler
 from flask_bootstrap import Bootstrap
@@ -69,7 +70,7 @@ def login():
     if app.config['USER_AUTH_TYPE'] == 'CSV':
         next = request.args.get('next')
         if not next and not next.startswith('http'):
-            next = Flask.url_for('index')
+            next = url_for('index')
         if user_auth.flask_current_user.is_authenticated:
             return redirect(next)
         if request.method == 'POST':
@@ -98,7 +99,7 @@ def login_redirect():
 def logout():
     session['logged_in'] = False
     user_auth.logout_user()
-    return redirect(Flask.url_for('index'))
+    return redirect(url_for('index'))
 
 
 @app.route("/bosh", methods=['GET', 'POST'])

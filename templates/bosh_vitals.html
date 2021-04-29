@@ -39,6 +39,7 @@ ction(data, status){
     <thead><tr><th></th><th></th><th><th>Sys</th><th>User</th><th>Wait</th>
     <th>1min</th><th>3min</th><th>5min</th></thead>
     {% for inst in deployment_vitals %}
+    {% if inst.vm_cid is not none %}
     <tr><td>{{ inst.job_name }}</td><td>{{ inst.vm_cid }}</td>
       <td>{{ inst.ips[0] }}</td><td>{{ inst.vitals.cpu.sys }}</td>
       <td>{{ inst.vitals.cpu.user }}</td><td>{{ inst.vitals.cpu.wait	}}</td>
@@ -47,6 +48,7 @@ ction(data, status){
       <td>{{ inst.vitals.swap.percent }}%</td>
       <td>{{ inst.resurrection_paused }}</td>
     </tr>
+    {% endif %}
     {% endfor %}
 </div>
 {% endblock %}

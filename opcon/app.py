@@ -131,6 +131,16 @@ def format_datetime(value):
     return time.ctime(value)
 
 
+@app.route("/bosh/tasks", methods=['GET'])
+@user_auth.flask_login_required
+def get_tasks():
+    limit = request.args.get('limit', default=0, type=int)
+    # return Response(director.get_job_history(limit),
+    #                 content_type='application/json')
+    return render_template('bosh_history.html',
+                           tasks=director.get_job_history(limit))
+
+
 @app.route("/bosh/tasks/<taskid>", methods=['GET'])
 @user_auth.flask_login_required
 def download_logs(taskid):
@@ -151,6 +161,22 @@ def download_logs(taskid):
                     headers={'Content-Disposition': "attachment; filename={}".format(filename)})
 
 
+@app.route("/bosh/tasks/<taskid>/output", methods=['GET'])
+@user_auth.flask_login_required
+def get_task_output(taskid):
+    output_type = request.args.get('type')
+    if output_type == '':
+        output_type = 'result'
+    task_url = '/tasks/{}/output'.format(taskid)
+    r = director.session.get(director.bosh_url + task_url,
+                             params={'type': output_type},
+                             verify=director.verify_tls)
+    if r.ok:
+        return Response(r.text, content_type='text/plain')
+    else:
+        return Response("error fetching task {} output".format(taskid) + r.text,
+                        content_type='text/plain')
+
 @app.route("/bosh/deployment/vitals", methods=['GET'])
 @user_auth.flask_login_required
 def get_deployment_vitals_default():
@@ -169,16 +195,6 @@ def get_deployment_vitals_default():
 def get_deployment_jobs(deployment):
     return Response(json.dumps(director.get_deployment_jobs(deployment)),
                     content_type='application/json')
-
-
-@app.route("/bosh/tasks", methods=['GET'])
-@user_auth.flask_login_required
-def get_tasks():
-    limit = request.args.get('limit', default=0, type=int)
-    # return Response(director.get_job_history(limit),
-    #                 content_type='application/json')
-    return render_template('bosh_history.html',
-                           tasks=director.get_job_history(limit))
 
 
 director = director.Director(config.get('o_director_url'),

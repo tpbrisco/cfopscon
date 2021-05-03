@@ -199,7 +199,7 @@ def get_deployment_jobs(deployment):
 
 @app.route('/vm_control', methods=['GET'])
 @user_auth.flask_login_required
-def vm_control(): # deployment, vmi, action):
+def vm_control(): # (deployment, vmi, action):
     deployment = request.args.get('deployment')
     vmi = request.args.get('vmi')
     action = request.args.get('action')

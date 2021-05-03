@@ -18,17 +18,12 @@
 <script>
   function clickedOn(vmi, action) {
       var dep = $("#deployment_list").val()
-      alert(dep + "->" + action + "(" + vmi + ")")
-      $.get("/vm_control?deployment=" + dep + "&vmi=" + vmi + "&action=" + action)
+      // alert(dep + "->" + action + "(" + vmi + ")")
+      var doit = confirm("really " + action + " " + vmi + "?")
+      if (doit == true) {
+	  $.get("/vm_control?deployment=" + dep + "&vmi=" + vmi + "&action=" + action)
+      }
   }
-</script>
-<script>
-      $("#action").click(function() {
-	  var vmi = $(this).attr('vm')
-	  var act = $(this).attr('action')
-	  var dep = $("#deployment_list").val()
-	  alert("deployment " + dep + " action " + act)
-      })
 </script>
 <div class="col-md-8 offset-md-2">
   <h1>BOSH vitals {{ deployment_name }}</h1>

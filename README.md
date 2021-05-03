@@ -47,7 +47,7 @@ Or, for cloud foundry foundations
 - Implement authentication for access to the system; 
   Should support "fake_auth" (~~local CSV?~~), ~~UAA auth~~, and maybe
   3rd-party OAuth2 endpoints.
-- recreate specific VMs
+- ~~recreate specific VMs~~
 - home page statistics -- include "interesting" stats about BOSH, CF
 - ~~show VM health state (bosh vms --vitals)~~
 - ~~Implement auto-fill for BOSH deployment jobs~~

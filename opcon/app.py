@@ -197,6 +197,42 @@ def get_deployment_jobs(deployment):
                     content_type='application/json')
 
 
+@app.route('/vm_control', methods=['GET'])
+@user_auth.flask_login_required
+def vm_control(): # deployment, vmi, action):
+    deployment = request.args.get('deployment')
+    vmi = request.args.get('vmi')
+    action = request.args.get('action')
+    skip_drain = request.args.get('skip_drain')
+    inst_group, inst = vmi.split('/')
+    if deployment is None or vmi is None or inst_group is None or inst is None:
+        return Response("{'error': 'deployment, vm required (vm as vm/guid or vm/index)'}",
+                        status_code=400,
+                        content_type='application/json')
+    if action not in ['restart', 'recreate', 'stop', 'start' ]:
+        return Response("{'error': 'action is required: restart,recreate,stop,start'}",
+                        status_code=400,
+                        content_type='application/json')
+    if skip_drain is None:
+        skip_drain = False
+    action_url = '{}/deployments/{}/instance_groups/{}/{}/actions/{}'.format(
+        director.bosh_url, deployment, inst_group, inst, action)
+    a_r = director.session.post(action_url,
+                               params = {'skip_drain': skip_drain},
+                               verify=director.verify_tls)
+    if director.debug:
+        print("URL {} returns {}".format(action_url, a_r.text))
+    if a_r.ok:
+        return Response(status=a_r.status_code,
+                        content_type='application/json',
+                        response=a_r.json())
+    else:
+        error_msg = {'error': a_r.text}
+        return Response(error_msg,
+                        status=a_r.status_code,
+                        content_type='application/json')
+    
+
 director = director.Director(config.get('o_director_url'),
                              config.get('o_bosh_user'),
                              config.get('o_bosh_pass'),
@@ -208,6 +244,9 @@ scheduler.add_job(id='oauth-refresh',
                   func=director.refresh_token,
                   trigger='interval',
                   seconds=director.oauth_token_expires() - 30)
-
+scheduler.add_job(id='deployments-refresh',
+                  func=director.get_deployments,
+                  trigger='interval',
+                  seconds=120)
 if __name__ == '__main__':
     app.run(debug=config['o_debug'])

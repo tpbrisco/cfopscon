@@ -47,13 +47,14 @@ Or, for cloud foundry foundations
 - Implement authentication for access to the system; 
   Should support "fake_auth" (~~local CSV?~~), ~~UAA auth~~, and maybe
   3rd-party OAuth2 endpoints.
-- ~~recreate specific VMs~~
+- cancel tasks
 - home page statistics -- include "interesting" stats about BOSH, CF
-- ~~show VM health state (bosh vms --vitals)~~
-- ~~Implement auto-fill for BOSH deployment jobs~~
 - Investigate and support bosh-cli-like syntax "bosh logs compute" for
   logs from all "compute" jobs.
 - "flash" updates on the status of things in wait;  E.g. waiting on a
   job to complete for logs download - put a status update.
   Presumably jQuery, and use the /deployments/:deployment/instances API~~
 - restart CF brokers
+- ~~recreate specific VMs~~
+- ~~show VM health state (bosh vms --vitals)~~
+- ~~Implement auto-fill for BOSH deployment jobs~~

@@ -177,6 +177,17 @@ def get_task_output(taskid):
         return Response("error fetching task {} output".format(taskid) + r.text,
                         content_type='text/plain')
 
+@app.route("/bosh/tasks/<taskid>/cancel", methods=['GET'])
+@user_auth.flask_login_required
+def cancel_task(taskid):
+    task_url = '/task/{}'.format(taskid)
+    r = director.session.delete(director.bosh_url + task_url)
+    if r.ok:
+        return Response("{}", status_code=r.status)
+    else:
+        return Response(r.text, status_code=r.status)
+
+
 @app.route("/bosh/deployment/vitals", methods=['GET'])
 @user_auth.flask_login_required
 def get_deployment_vitals_default():

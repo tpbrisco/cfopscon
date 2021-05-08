@@ -75,7 +75,8 @@ class Director(object):
             verify=self.verify_tls
             )
         if not r.ok:
-            print(f"oauth request({r.status_code}) {r.content}")
+            print(f"oauth refresh failed request({r.status_code}) {r.content}")
+            self.init_auth(self.uaa_url, self.bosh_user, self.bosh_pass)
             return
         j = r.json()
         self.oauth = j.copy()

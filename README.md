@@ -47,7 +47,7 @@ Or, for cloud foundry foundations
 - Implement authentication for access to the system; 
   Should support "fake_auth" (~~local CSV?~~), ~~UAA auth~~, and maybe
   3rd-party OAuth2 endpoints.
-- cancel tasks
+- ~~cancel tasks~~
 - home page statistics -- include "interesting" stats about BOSH, CF
 - Investigate and support bosh-cli-like syntax "bosh logs compute" for
   logs from all "compute" jobs.

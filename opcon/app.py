@@ -10,7 +10,6 @@ from flask import (
     Response,
     redirect,
     stream_with_context,
-    session,
     flash,
     url_for
 )
@@ -46,6 +45,7 @@ if config.get('o_debug'):
 if config.get('o_auth_type'):
     app.config['USER_AUTH_TYPE'] = config.get('o_auth_type')
     app.config['USER_AUTH_DATA'] = config.get('o_auth_data')
+    app.config['USER_AUTH_MOD'] = config.get('o_auth_mod')
 
 user_auth = auth.user_authentication(app)
 user_auth.ua_login_manager.init_app(app)
@@ -97,7 +97,6 @@ def login_redirect():
 
 @app.route('/logout')
 def logout():
-    session['logged_in'] = False
     user_auth.logout_user()
     return redirect(url_for('index'))
 

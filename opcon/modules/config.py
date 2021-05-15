@@ -20,6 +20,7 @@ class config(object):
                 a = configini['auth']
                 self.config['o_auth_type'] = a.get('type')
                 self.config['o_auth_data'] = a.get('data')
+                self.config['o_auth_mod'] = a.get('module')
         # command line parsing is second, to override config file
         if 'command_line' in kwargs and kwargs['command_line'] is True:
             from optparse import OptionParser

@@ -3,7 +3,7 @@ import flask_login
 from werkzeug.security import generate_password_hash, check_password_hash
 import sys
 import random
-
+import importlib
 
 class User(object):
     def __init__(self, name):
@@ -103,6 +103,13 @@ class user_authentication(object):
         '''create user authentication object based on app.conf['USER_AUTH_TYPE']'''
         self.ua_type = app.config['USER_AUTH_TYPE']
         self.ua_login_manager = LoginManager()
+        if self.ua_type == 'MOD':
+            try:
+               importlib.import_module(app.config['USER_AUTH_MOD'])
+            except:
+                print("Issues loading {}".format(app.config['USER_AUTH_MOD']),
+                      file=sys.stderr)
+                sys.exit(1)
         if self.ua_type == 'CSV':
             self.user_auth = user_csv(app.config['USER_AUTH_DATA'])
         elif self.ua_type == 'UAA':

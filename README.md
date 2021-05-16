@@ -3,7 +3,7 @@ The Cloud Foundry Operator's Console
 ![image of console](assets/console.png)
 
 The CF Operator's Console is intended to reduce toil for many common
-cloud operator tasks (e.g. obtaining and downloading logs).  It
+cloud foundry operator tasks (e.g. obtaining and downloading logs).  It
 operates as a cloud foundry application, but has some specific
 requirements outlined below (in order to obtain appropriate access).
 
@@ -18,19 +18,21 @@ it's goals; as such, it must contain privileged information (see opcon.ini)
 access the appropriate APIs.
 
 ## Current Status
-Currently a single "bosh logs" is possible, however work is in
-progress to see the BOSH director task backlog.  Addtiional "to do"
-items include database health checks, VM status information, and so
-forth.
+Common BOSH operations are supported
+* retrieving logs from VMs ("bosh logs")
+* VM "vitals" ("bosh vms --vitals") with restart/stop/start/recreate operations, 
+* Task results and controls - task cancelling, and results/debug/events logs
+
+Whle current bosh-centric, plans include extending the model for
+common cloud foundry operational tasks.  See "TO DO' for planned work.
 
 ## Deployment
-At the moment, it''s currently a simple Flask application that can be
-ran from the desktop (assuming access to the BOSH director is
-possible), however it does run under gunicorn to support the cf-push
-model of deployment.  For the moment, a simple
-```bash
-% FLASK_APP='opcon.app:app' flask run
-```
+The _CF Operator's Console_ is a Flask application that can be ran
+from the desktop via Flask commands (assuming BOSH director access), 
+as well as under gunicorn to support the cf-push model of deployment.
+
+To run from the desktop:
+ ```bash % FLASK_APP='opcon.app:app' flask run ```
 should result in a running system, accessible from localhost:5000.
 
 Or, for more production use-cases

@@ -21,7 +21,8 @@ class UserAuth(object):
         return
 
     def user_auth(self, username, password):
-        print("user_auth(user, pass)")
+        print("user_auth(user={}, pass)".format(username))
+        username =str(username)
         if username not in self.uc_hash:
             print("no user {} found".format(username))
             return False
@@ -34,7 +35,9 @@ class UserAuth(object):
         return False
 
     def user_loader(self, username):
-        print("user_loader(user)")
+        username =username.decode('utf-8')
+        print("user_loader(user={})".format(username))
         if username not in self.uc_hash:
+            print("user_loader() returns None")
             return None
-        return user
+        return username

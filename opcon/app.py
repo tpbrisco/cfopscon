@@ -71,19 +71,18 @@ def login():
     next = request.args.get('next')
     if not next and not next.startswith('http'):
         next = url_for('index')
-    if app.config['USER_AUTH_TYPE'] == 'MOD':
-        if request.method == 'POST':
+    ua_type = user_auth.ua_lib.auth_type
+    if request.method == 'POST':
+        if ua_type == 'userpass':
             username = request.form['username']
             password = request.form['password']
             user_auth.login_user(username, password)
             return redirect(next)
+        # elif ua_type == 'oidc'
         return render_template("login_csv.html")
-    elif app.config['USER_AUTH_TYPE'] == 'UAA':
-        return render_template("login_uaa.html",
-                               cf_login=user_auth.ua_lib.auth_url)
     else:
+        # GET assumes we want to login, redirect to form based on ua_type
         return render_template('login_csv.html')
-
 
 @app.route('/login_redirect', methods=['GET', 'POST'])
 def login_redirect():

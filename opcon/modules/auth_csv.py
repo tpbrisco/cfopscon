@@ -10,6 +10,7 @@ class UserAuth(object):
     def __init__(self, csvfile):
         self.uc_csvfile = csvfile
         self.uc_hash = dict()
+        self.auth_type = 'userpass'  # for app.py:login() method
         with open(self.uc_csvfile, 'r') as f:
             for line in f:
                 user, phash = line.strip().split(',')

@@ -1,6 +1,4 @@
-from flask_login import LoginManager
 import flask_login
-from werkzeug.security import generate_password_hash, check_password_hash
 import sys
 import random
 import importlib
@@ -49,7 +47,7 @@ class user_uaa(object):
 
     def login_user(self, username, password):
         '''initiate user login'''
-        if self.user_auth.user_auth(username, password):
+        if self.ua_lib.user_auth(username, password):
             ok_user = User(username)
             ok_user.is_authenticated = True
             ok_user.is_anonymous =True
@@ -70,7 +68,7 @@ class user_authentication(object):
     def __init__(self, app):
         '''create user authentication object based on app.conf['USER_AUTH_TYPE']'''
         self.ua_type = app.config['USER_AUTH_TYPE']
-        self.ua_login_manager = LoginManager()
+        self.ua_login_manager = flask_login.LoginManager()
         if self.ua_type == 'MOD':
             mod_file = app.config['USER_AUTH_MOD']
             print("Loading module '{}'".format(app.config['USER_AUTH_MOD']), file=sys.stdout)
@@ -83,9 +81,9 @@ class user_authentication(object):
                 sys.exit(1)
             # loadable modules have UserAuth object defined
             print("Module {} loaded".format(app.config['USER_AUTH_MOD']))
-            self.user_auth = modlib.UserAuth(app.config['USER_AUTH_DATA'])
+            self.ua_lib = modlib.UserAuth(app.config['USER_AUTH_DATA'])
         elif self.ua_type == 'UAA':
-            self.user_auth = user_uaa(app.config['USER_AUTH_DATA'])
+            self.ua_lib = user_uaa(app.config['USER_AUTH_DATA'])
         else:
             # handle "no authentication type defined"
             sys.stderr.write("No valid authentication scheme selected\n")
@@ -100,7 +98,7 @@ class user_authentication(object):
 
     def login_user(self, username, password):
         '''initiate user login'''
-        if self.user_auth.user_auth(username, password):
+        if self.ua_lib.user_auth(username, password):
             ok_user = User(username)
             ok_user.is_authenticated = True
             ok_user.is_anonymous = False
@@ -111,7 +109,7 @@ class user_authentication(object):
         return None
 
     def user_loader(self, id):
-        username = self.user_auth.user_loader(id)
+        username = self.ua_lib.user_loader(id)
         ok_user = User(username)
         ok_user.is_authenticated = True
         ok_user.is_anonymous = False

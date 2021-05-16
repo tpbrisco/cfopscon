@@ -80,7 +80,7 @@ def login():
         return render_template("login_csv.html")
     elif app.config['USER_AUTH_TYPE'] == 'UAA':
         return render_template("login_uaa.html",
-                               cf_login=user_auth.user_auth.auth_url)
+                               cf_login=user_auth.ua_lib.auth_url)
     else:
         return render_template('login_csv.html')
 

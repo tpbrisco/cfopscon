@@ -32,7 +32,9 @@ from the desktop via Flask commands (assuming BOSH director access),
 as well as under gunicorn to support the cf-push model of deployment.
 
 To run from the desktop:
- ```bash % FLASK_APP='opcon.app:app' flask run ```
+ ```bash
+% FLASK_APP='opcon.app:app' flask run
+```
 should result in a running system, accessible from localhost:5000.
 
 Or, for more production use-cases

@@ -78,15 +78,6 @@ def login():
             user_auth.login_user(username, password)
             return redirect(next)
         return render_template("login_csv.html")
-    elif app.config['USER_AUTH_TYPE'] == 'CSV':
-        if user_auth.flask_current_user.is_authenticated:
-            return redirect(next)
-        if request.method == 'POST':
-            username = request.form['username']
-            password = request.form['password']
-            user_auth.login_user(username, password)
-            return redirect(next)
-        return render_template('login_csv.html')
     elif app.config['USER_AUTH_TYPE'] == 'UAA':
         return render_template("login_uaa.html",
                                cf_login=user_auth.user_auth.auth_url)

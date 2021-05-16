@@ -66,38 +66,6 @@ class user_uaa(object):
         return ok
 
 
-class user_csv(object):
-    def __init__(self, csvfile):
-        self.uc_csvfile = csvfile
-        self.uc_hash = dict()
-        with open(self.uc_csvfile, 'r') as f:
-            for line in f:
-                user, phash = line.strip().split(',')
-                if user in self.uc_hash:
-                    print("User ({}) already exists".format(user))
-                    sys.exit(1)
-                self.uc_hash[user] = phash
-                print("adding {}/{}".format(user, phash))
-        return
-
-    def user_auth(self, username, password):
-        if username not in self.uc_hash:
-            print("no user {} found".format(username))
-            return False
-        try:
-            if check_password_hash(self.uc_hash[username], password):
-                return True
-        except TypeError as e:
-            print("could not check hash {}".format(self.uc_hash[username]))
-            print("Error {}".format(e))
-        return False
-
-    def user_loader(self, username):
-        if username not in self.uc_hash:
-            return False
-        return self.uc_hash[username]
-
-
 class user_authentication(object):
     def __init__(self, app):
         '''create user authentication object based on app.conf['USER_AUTH_TYPE']'''
@@ -116,8 +84,6 @@ class user_authentication(object):
             # loadable modules have UserAuth object defined
             print("Module {} loaded".format(app.config['USER_AUTH_MOD']))
             self.user_auth = modlib.UserAuth(app.config['USER_AUTH_DATA'])
-        elif self.ua_type == 'CSV':
-            self.user_auth = user_csv(app.config['USER_AUTH_DATA'])
         elif self.ua_type == 'UAA':
             self.user_auth = user_uaa(app.config['USER_AUTH_DATA'])
         else:

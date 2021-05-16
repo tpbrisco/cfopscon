@@ -16,7 +16,7 @@ class User(object):
         return self.username
 
     def __repr__(self):
-        return "[{} Anon:{} Active:{} Auth'd:{}]".format(self.username,
+        return "[{} Anon:{} Active:{} Auth'd:{}]".format(self.username.decode("utf-8"),
                                                          self.is_anonymous,
                                                          self.is_active,
                                                          self.is_authenticated)
@@ -104,13 +104,19 @@ class user_authentication(object):
         self.ua_type = app.config['USER_AUTH_TYPE']
         self.ua_login_manager = LoginManager()
         if self.ua_type == 'MOD':
+            mod_file = app.config['USER_AUTH_MOD']
+            print("Loading module '{}'".format(app.config['USER_AUTH_MOD']), file=sys.stdout)
             try:
-               importlib.import_module(app.config['USER_AUTH_MOD'])
-            except:
-                print("Issues loading {}".format(app.config['USER_AUTH_MOD']),
+               modlib = importlib.import_module('opcon.modules.' + mod_file,
+                                       package='UserAuth')
+            except Exception as e:
+                print("Issues loading {}: {}".format(mod_file, e),
                       file=sys.stderr)
                 sys.exit(1)
-        if self.ua_type == 'CSV':
+            # loadable modules have UserAuth object defined
+            print("Module {} loaded".format(app.config['USER_AUTH_MOD']))
+            self.user_auth = modlib.UserAuth(app.config['USER_AUTH_DATA'])
+        elif self.ua_type == 'CSV':
             self.user_auth = user_csv(app.config['USER_AUTH_DATA'])
         elif self.ua_type == 'UAA':
             self.user_auth = user_uaa(app.config['USER_AUTH_DATA'])
@@ -139,8 +145,9 @@ class user_authentication(object):
         return None
 
     def user_loader(self, id):
-        ok = User(id)
-        ok.is_authenticated = True
-        ok.is_active = True
-        ok.is_anonymous = False
-        return ok
+        username = self.user_auth.user_loader(id)
+        ok_user = User(username)
+        ok_user.is_authenticated = True
+        ok_user.is_anonymous = False
+        ok_user.is_active = True
+        return ok_user

@@ -9,6 +9,7 @@ from flask import (
     request,
     Response,
     redirect,
+    has_request_context,
     stream_with_context,
     flash,
     url_for
@@ -67,10 +68,17 @@ def load_user(id):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if app.config['USER_AUTH_TYPE'] == 'CSV':
-        next = request.args.get('next')
-        if not next and not next.startswith('http'):
-            next = url_for('index')
+    next = request.args.get('next')
+    if not next and not next.startswith('http'):
+        next = url_for('index')
+    if app.config['USER_AUTH_TYPE'] == 'MOD':
+        if request.method == 'POST':
+            username = request.form['username']
+            password = request.form['password']
+            user_auth.login_user(username, password)
+            return redirect(next)
+        return render_template("login_csv.html")
+    elif app.config['USER_AUTH_TYPE'] == 'CSV':
         if user_auth.flask_current_user.is_authenticated:
             return redirect(next)
         if request.method == 'POST':

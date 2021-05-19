@@ -98,6 +98,14 @@ class user_authentication(object):
 
     def login_user(self, username, password):
         '''initiate user login'''
+        if self.ua_lib.auth_type == 'oidc':
+            ok_user = User(username)
+            ok_user.is_authenticated = True
+            ok_user.is_anonymous  = False
+            ok_user.is_active = True
+            print("User:{} logged in".format(ok_user))
+            self.flask_login_user(ok_user)
+            return ok_user
         if self.ua_lib.user_auth(username, password):
             ok_user = User(username)
             ok_user.is_authenticated = True

@@ -11,6 +11,7 @@ class UserAuth(object):
         self.uc_csvfile = csvfile
         self.uc_hash = dict()
         self.auth_type = 'userpass'  # for app.py:login() method
+        self.auth_brand = 'CSV, FTW' # branding info
         with open(self.uc_csvfile, 'r') as f:
             for line in f:
                 user, phash = line.strip().split(',')

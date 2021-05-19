@@ -16,6 +16,7 @@ from flask import (
 )
 from flask_apscheduler import APScheduler
 from flask_bootstrap import Bootstrap
+import requests
 import uuid
 import os
 import sys
@@ -66,23 +67,73 @@ def load_user(id):
     return user_auth.user_loader(id)
 
 
+@app.route('/_callback', methods=['GET'])
+def login_callback():
+    auth_type = user_auth.ua_lib.auth_type
+    if auth_type != 'oidc':
+        return Response('not oidc enabled', 401)
+    code = request.args.get("code")
+    token_endpoint = user_auth.ua_lib.oidc_config['token_endpoint']
+    token_url, headers, body = user_auth.ua_lib.client.prepare_token_request(
+        token_endpoint,
+        authorization_response=request.url,
+        redirect_url=request.base_url,
+        code=code)
+    token_r = requests.post(
+        token_url,
+        headers=headers,
+        data=body,
+        auth=(user_auth.ua_lib.google_client_id, user_auth.ua_lib.google_client_secret))
+    # parse tokens
+    user_auth.ua_lib.client.parse_request_body_response(json.dumps(token_r.json()))
+    # set up user as logged in
+    userinfo_url = user_auth.ua_lib.oidc_config['userinfo_endpoint']
+    uri, headers, body = user_auth.ua_lib.client.add_token(userinfo_url)
+    userinfo_r = requests.get(uri, headers=headers, data=body)
+    userinfo_data = userinfo_r.json()
+    # print("userinfo_data: {}".format(json.dumps(userinfo_data, indent=2)))
+    user_auth.login_user(userinfo_data['email'], userinfo_data['given_name'])
+    # now that we've completed the user login, redirect back to "next"
+    return redirect(url_for('index'))
+    
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     next = request.args.get('next')
     if not next and not next.startswith('http'):
         next = url_for('index')
     ua_type = user_auth.ua_lib.auth_type
+    print("ua_type={}".format(ua_type))
     if request.method == 'POST':
         if ua_type == 'userpass':
             username = request.form['username']
             password = request.form['password']
             user_auth.login_user(username, password)
             return redirect(next)
-        # elif ua_type == 'oidc'
+        elif ua_type == 'oidc':
+            request_uri = user_auth.ua_lib.client.prepare_request_uri(
+                user_auth.ua_lib.oidc_config['authorization_endpoint'],
+                redirect_url="/_callback",
+                scope=["openid", "email", "profile"])
+            print("POST oidc render brand={} request_uri={}".format(user_auth.ua_lib.auth_brand,
+                                                               user_auth.ua_lib.request_uri))
+            render_template("login_oidc.html",
+                            ua_brand=user_auth.ua_lib.auth_brand,
+                            ua_action=user_auth.ua_lib.request_uri)
         return render_template("login_csv.html")
     else:
         # GET assumes we want to login, redirect to form based on ua_type
-        return render_template('login_csv.html')
+        if ua_type == 'userpass':
+            return render_template('login_csv.html')
+        elif ua_type == 'oidc':
+            print("GET oidc render brand={} request_uri={}".format(user_auth.ua_lib.auth_brand,
+                                                               user_auth.ua_lib.request_uri))
+            return render_template('login_oidc.html',
+                                   ua_brand=user_auth.ua_lib.auth_brand,
+                                   ua_action=user_auth.ua_lib.request_uri)
+        else:
+            return render_template('login_csv.html')
 
 @app.route('/login_redirect', methods=['GET', 'POST'])
 def login_redirect():

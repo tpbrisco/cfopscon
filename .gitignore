@@ -3,3 +3,4 @@ dev
 *pyc
 opcon.ini
 users.csv
+__pycache__

@@ -9,7 +9,6 @@ from flask import (
     request,
     Response,
     redirect,
-    has_request_context,
     stream_with_context,
     flash,
     url_for
@@ -83,7 +82,8 @@ def login_callback():
         token_url,
         headers=headers,
         data=body,
-        auth=(user_auth.ua_lib.google_client_id, user_auth.ua_lib.google_client_secret))
+        auth=(user_auth.ua_lib.google_client_id,
+              user_auth.ua_lib.google_client_secret))
     # parse tokens
     user_auth.ua_lib.client.parse_request_body_response(json.dumps(token_r.json()))
     # set up user as logged in
@@ -95,7 +95,6 @@ def login_callback():
     user_auth.login_user(userinfo_data['email'], userinfo_data['given_name'])
     # now that we've completed the user login, redirect back to "next"
     return redirect(url_for('index'))
-    
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -116,8 +115,9 @@ def login():
                 user_auth.ua_lib.oidc_config['authorization_endpoint'],
                 redirect_url="/_callback",
                 scope=["openid", "email", "profile"])
-            print("POST oidc render brand={} request_uri={}".format(user_auth.ua_lib.auth_brand,
-                                                               user_auth.ua_lib.request_uri))
+            print("POST oidc render brand={} request_uri={}".format(
+                user_auth.ua_lib.auth_brand,
+                user_auth.ua_lib.request_uri))
             render_template("login_oidc.html",
                             ua_brand=user_auth.ua_lib.auth_brand,
                             ua_action=user_auth.ua_lib.request_uri)
@@ -127,13 +127,15 @@ def login():
         if ua_type == 'userpass':
             return render_template('login_csv.html')
         elif ua_type == 'oidc':
-            print("GET oidc render brand={} request_uri={}".format(user_auth.ua_lib.auth_brand,
-                                                               user_auth.ua_lib.request_uri))
+            print("GET oidc render brand={} request_uri={}".format(
+                user_auth.ua_lib.auth_brand,
+                user_auth.ua_lib.request_uri))
             return render_template('login_oidc.html',
                                    ua_brand=user_auth.ua_lib.auth_brand,
                                    ua_action=user_auth.ua_lib.request_uri)
         else:
             return render_template('login_csv.html')
+
 
 @app.route('/login_redirect', methods=['GET', 'POST'])
 def login_redirect():
@@ -222,8 +224,9 @@ def get_task_output(taskid):
     if r.ok:
         return Response(r.text, content_type='text/plain')
     else:
-        return Response("error fetching task {} output".format(taskid) + r.text,
-                        content_type='text/plain')
+        return Response("error fetching task {} output".format(
+            taskid) + r.text, content_type='text/plain')
+
 
 @app.route("/bosh/tasks/<taskid>/cancel", methods=['GET'])
 @user_auth.flask_login_required
@@ -258,7 +261,7 @@ def get_deployment_jobs(deployment):
 
 @app.route('/vm_control', methods=['GET'])
 @user_auth.flask_login_required
-def vm_control(): # (deployment, vmi, action):
+def vm_control():   # (deployment, vmi, action):
     deployment = request.args.get('deployment')
     vmi = request.args.get('vmi')
     action = request.args.get('action')
@@ -268,7 +271,7 @@ def vm_control(): # (deployment, vmi, action):
         return Response("{'error': 'deployment, vm required (vm as vm/guid or vm/index)'}",
                         status_code=400,
                         content_type='application/json')
-    if action not in ['restart', 'recreate', 'stop', 'start' ]:
+    if action not in ['restart', 'recreate', 'stop', 'start']:
         return Response("{'error': 'action is required: restart,recreate,stop,start'}",
                         status_code=400,
                         content_type='application/json')
@@ -277,8 +280,8 @@ def vm_control(): # (deployment, vmi, action):
     action_url = '{}/deployments/{}/instance_groups/{}/{}/actions/{}'.format(
         director.bosh_url, deployment, inst_group, inst, action)
     a_r = director.session.post(action_url,
-                               params = {'skip_drain': skip_drain},
-                               verify=director.verify_tls)
+                                params={'skip_drain': skip_drain},
+                                verify=director.verify_tls)
     if director.debug:
         print("URL {} returns {}".format(action_url, a_r.text))
     if a_r.ok:
@@ -290,7 +293,7 @@ def vm_control(): # (deployment, vmi, action):
         return Response(error_msg,
                         status=a_r.status_code,
                         content_type='application/json')
-    
+
 
 director = director.Director(config.get('o_director_url'),
                              config.get('o_bosh_user'),

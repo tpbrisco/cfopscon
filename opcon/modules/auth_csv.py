@@ -3,7 +3,7 @@ import sys
 
 # UserAuth must be defined for loadable modules to work
 # Methods:
-# - init("option,option,option") - takes a comma-delimited string for parameters
+# - init("option,option,option") - comma-delimited string for parameters
 # - user_auth(username, password) - potentially dummy method
 # - user_loader(username) - locate user if known
 class UserAuth(object):
@@ -11,7 +11,7 @@ class UserAuth(object):
         self.uc_csvfile = csvfile
         self.uc_hash = dict()
         self.auth_type = 'userpass'  # for app.py:login() method
-        self.auth_brand = 'CSV, FTW' # branding info
+        self.auth_brand = 'CSV, FTW'  # branding info
         with open(self.uc_csvfile, 'r') as f:
             for line in f:
                 user, phash = line.strip().split(',')
@@ -24,7 +24,7 @@ class UserAuth(object):
 
     def user_auth(self, username, password):
         print("user_auth(user={}, pass)".format(username))
-        username =str(username)
+        username = str(username)
         if username not in self.uc_hash:
             print("no user {} found".format(username))
             return False
@@ -37,7 +37,7 @@ class UserAuth(object):
         return False
 
     def user_loader(self, username):
-        username =username.decode('utf-8')
+        username = username.decode('utf-8')
         print("user_loader(user={})".format(username))
         if username not in self.uc_hash:
             print("user_loader() returns None")

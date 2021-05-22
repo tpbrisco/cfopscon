@@ -3,6 +3,7 @@ import sys
 import random
 import importlib
 
+
 class User(object):
     def __init__(self, name):
         self.is_authenticated = False
@@ -50,7 +51,7 @@ class user_uaa(object):
         if self.ua_lib.user_auth(username, password):
             ok_user = User(username)
             ok_user.is_authenticated = True
-            ok_user.is_anonymous =True
+            ok_user.is_anonymous = True
             ok_user.is_active = True
             print("User: {} logged in".format(ok_user))
             return ok_user
@@ -73,8 +74,8 @@ class user_authentication(object):
             mod_file = app.config['USER_AUTH_MOD']
             print("Loading module '{}'".format(app.config['USER_AUTH_MOD']), file=sys.stdout)
             try:
-               modlib = importlib.import_module('opcon.modules.' + mod_file,
-                                       package='UserAuth')
+                modlib = importlib.import_module('opcon.modules.' + mod_file,
+                                                 package='UserAuth')
             except Exception as e:
                 print("Issues loading {}: {}".format(mod_file, e),
                       file=sys.stderr)
@@ -101,7 +102,7 @@ class user_authentication(object):
         if self.ua_lib.auth_type == 'oidc':
             ok_user = User(username)
             ok_user.is_authenticated = True
-            ok_user.is_anonymous  = False
+            ok_user.is_anonymous = False
             ok_user.is_active = True
             print("User:{} logged in".format(ok_user))
             self.flask_login_user(ok_user)

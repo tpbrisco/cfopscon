@@ -9,11 +9,12 @@ import sys
 
 
 class UserAuth(object):
-    def __init__(self, keyvars):
+    def __init__(self, appopt):
         # GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
         (self.google_client_id,
          self.google_client_secret,
-         self.base_url) = keyvars.split(',')
+         self.base_url) = appopt.config['USER_AUTH_DATA'].split(',')
+        self.debug = appopt.config['USER_AUTH_DEBUG']
         self.auth_type = 'oidc'  # for app.py:login() method
         self.auth_brand = 'Google'
         self.discovery = 'https://accounts.google.com/.well-known/openid-configuration'
@@ -38,7 +39,8 @@ class UserAuth(object):
         access_token = resp['access_token']
 
     def user_loader(self, username):
-        print("user_loader(user)")
+        if self.debug:
+            print("user_loader({})".format(username))
         if username not in self.ug_hash:
             return None
         return username

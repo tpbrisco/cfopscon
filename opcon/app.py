@@ -47,6 +47,7 @@ if config.get('o_auth_type'):
     app.config['USER_AUTH_TYPE'] = config.get('o_auth_type')
     app.config['USER_AUTH_DATA'] = config.get('o_auth_data')
     app.config['USER_AUTH_MOD'] = config.get('o_auth_mod')
+    app.config['USER_AUTH_DEBUG'] = config.get('o_auth_debug')
 
 user_auth = auth.user_authentication(app)
 user_auth.ua_login_manager.init_app(app)
@@ -103,7 +104,9 @@ def login():
     if not next and not next.startswith('http'):
         next = url_for('index')
     ua_type = user_auth.ua_lib.auth_type
-    print("ua_type={}".format(ua_type))
+    ua_debug = app.config['USER_AUTH_DEBUG']
+    if ua_debug:
+        print("ua_type={}".format(ua_type))
     if request.method == 'POST':
         if ua_type == 'userpass':
             username = request.form['username']
@@ -115,9 +118,10 @@ def login():
                 user_auth.ua_lib.oidc_config['authorization_endpoint'],
                 redirect_url="/_callback",
                 scope=["openid", "email", "profile"])
-            print("POST oidc render brand={} request_uri={}".format(
-                user_auth.ua_lib.auth_brand,
-                user_auth.ua_lib.request_uri))
+            if ua_debug:
+                print("POST oidc render brand={} request_uri={}".format(
+                    user_auth.ua_lib.auth_brand,
+                    user_auth.ua_lib.request_uri))
             render_template("login_oidc.html",
                             ua_brand=user_auth.ua_lib.auth_brand,
                             ua_action=user_auth.ua_lib.request_uri)
@@ -127,9 +131,10 @@ def login():
         if ua_type == 'userpass':
             return render_template('login_csv.html')
         elif ua_type == 'oidc':
-            print("GET oidc render brand={} request_uri={}".format(
-                user_auth.ua_lib.auth_brand,
-                user_auth.ua_lib.request_uri))
+            if ua_debug:
+                print("GET oidc render brand={} request_uri={}".format(
+                    user_auth.ua_lib.auth_brand,
+                    user_auth.ua_lib.request_uri))
             return render_template('login_oidc.html',
                                    ua_brand=user_auth.ua_lib.auth_brand,
                                    ua_action=user_auth.ua_lib.request_uri)

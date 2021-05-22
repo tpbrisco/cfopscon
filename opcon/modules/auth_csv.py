@@ -7,8 +7,9 @@ import sys
 # - user_auth(username, password) - potentially dummy method
 # - user_loader(username) - locate user if known
 class UserAuth(object):
-    def __init__(self, csvfile):
-        self.uc_csvfile = csvfile
+    def __init__(self, appopt):
+        self.uc_csvfile = appopt.config['USER_AUTH_DATA']
+        self.uc_debug = appopt.config['USER_AUTH_DEBUG']
         self.uc_hash = dict()
         self.auth_type = 'userpass'  # for app.py:login() method
         self.auth_brand = 'CSV, FTW'  # branding info

@@ -47,12 +47,29 @@ Or, for cloud foundry foundations
 % cf push -f manifestlyml
 ```
 
+## Options
+Options and configuration are contained in the "opcon.ini" file.  It
+is broken into 2 sections - "global" (really, for BOSH) and "auth".
+
+Options are specified below, with any default value indicated first.
+### global/bosh options
+- director\_url=_https:/10.100.10.10:25555_ - - the full URL for the bosh director
+- verify_tls=[False, True] -- disable/enable TLS validation (meant for debugging)
+- user=_admin_ -- username for the BOSH login
+- pass=_magic_ -- password for the BOSH login
+- debug=[False, True] -- disable/enable debugging for the director code
+  ### auth options
+  - type=MOD -- required, indicates loadable module
+  - module=_module.py_ - module located in modules/ area
+  - data=_mod\_specific_ - module-specific comma-seperated list
+
 ## TO DO
 - Implement authentication for access to the system; 
   Should support "fake_auth" (~~local CSV?~~), ~~UAA auth~~, and maybe
   3rd-party OAuth2 endpoints.
 - user activity tracking - log who-did-what
 - ~~cancel tasks~~
+- remove passwords from INI file
 - home page statistics -- include "interesting" stats about BOSH, CF
 - Investigate and support bosh-cli-like syntax "bosh logs compute" for
   logs from all "compute" jobs.

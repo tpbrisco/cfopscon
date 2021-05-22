@@ -58,7 +58,8 @@ Options are specified below, with any default value indicated first.
 - user=_admin_ -- username for the BOSH login
 - pass=_magic_ -- password for the BOSH login
 - debug=[False, True] -- disable/enable debugging for the director code
-  ### auth options
+
+### auth options
   - type=MOD -- required, indicates loadable module
   - module=_module.py_ - module located in modules/ area
   - data=_mod\_specific_ - module-specific comma-seperated list

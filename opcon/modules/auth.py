@@ -2,6 +2,7 @@ import flask_login
 import sys
 import random
 import importlib
+import datetime
 
 
 class User(object):
@@ -66,7 +67,7 @@ class user_authentication(object):
             ok_user.debug = self.debug
             if self.debug:
                 print("User:{} logged in".format(ok_user))
-            self.flask_login_user(ok_user)
+            self.flask_login_user(ok_user, duration=datetime.timedelta(hours=1))
             return ok_user
         if self.ua_lib.user_auth(username, password):
             ok_user = User(username)
@@ -76,7 +77,7 @@ class user_authentication(object):
             ok_user.debug = self.debug
             if self.debug:
                 print("User: {} logged in".format(ok_user))
-            self.flask_login_user(ok_user)
+            self.flask_login_user(ok_user, duration=datetime.timedelta(hours=1))
             return ok_user
         return None
 

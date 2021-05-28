@@ -25,7 +25,7 @@ class User(object):
 
 class user_authentication(object):
     def __init__(self, app):
-        '''create user authentication object based on app.conf['USER_AUTH_TYPE']'''
+        '''create user authentication object based on app.conf['USER_AUTH_*']'''
         self.ua_type = app.config['USER_AUTH_TYPE']
         self.ua_login_manager = flask_login.LoginManager()
         self.debug = app.config['USER_AUTH_DEBUG']
@@ -67,7 +67,8 @@ class user_authentication(object):
             ok_user.debug = self.debug
             if self.debug:
                 print("User:{} logged in".format(ok_user))
-            self.flask_login_user(ok_user, duration=datetime.timedelta(hours=1))
+            self.flask_login_user(ok_user,
+                                  duration=datetime.timedelta(hours=1))
             return ok_user
         if self.ua_lib.user_auth(username, password):
             ok_user = User(username)
@@ -77,7 +78,8 @@ class user_authentication(object):
             ok_user.debug = self.debug
             if self.debug:
                 print("User: {} logged in".format(ok_user))
-            self.flask_login_user(ok_user, duration=datetime.timedelta(hours=1))
+            self.flask_login_user(ok_user,
+                                  duration=datetime.timedelta(hours=1))
             return ok_user
         return None
 

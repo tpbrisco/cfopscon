@@ -32,11 +32,9 @@ class UserAuth(object):
             scope=["openid", "email", "profile"])
 
     def user_auth(self, username, password):
+        # real auth is done in app.py:login_callback(), and user token fetched from there
         self.ug_hash[username] = True
         return True
-
-    def authorize(self, resp):
-        access_token = resp['access_token']
 
     def user_loader(self, username):
         if self.debug:

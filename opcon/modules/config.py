@@ -9,8 +9,8 @@ class config(object):
         if 'config_file' in kwargs:
             configini = configparser.ConfigParser()
             configini.read(kwargs['config_file'])
-            if 'global' in configini:
-                g = configini['global']
+            if 'bosh' in configini:
+                g = configini['bosh']
                 self.config['o_debug'] = g.getboolean('debug', fallback=False)
                 self.config['o_director_url'] = g.get('director_url')
                 self.config['o_verify_tls'] = g.getboolean('verify_tls', fallback=True)

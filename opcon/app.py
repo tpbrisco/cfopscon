@@ -160,6 +160,8 @@ def logout():
 @app.route("/bosh", methods=['GET', 'POST'])
 @user_auth.flask_login_required
 def bosh_logs():
+    if len(director.deployments) == 0:
+        return render_template('index.html', director=director)
     if request.method == 'POST':
         form = boshforms.BoshLogsForm(request.form)
         if form.validate_on_submit():
@@ -177,7 +179,7 @@ def bosh_logs():
                                deployments=director.deployments,
                                jobs=director.get_deployment_jobs(director.deployments[0]),
                                tasks=director.pending_tasks)
-    return render_template('index.html')
+    return render_template('index.html', director=director)
 
 
 # add jinja template for converting "Epoch" dates to time strings
@@ -248,6 +250,8 @@ def cancel_task(taskid):
 @user_auth.flask_login_required
 def get_deployment_vitals_default():
     deployment = request.args.get('deployment')
+    if len(director.deployments) == 0:
+        return render_template('index.html', director=director)
     if deployment is None:
         deployment = director.deployments[0]
     vitals = director.get_deployment_vitals(deployment)

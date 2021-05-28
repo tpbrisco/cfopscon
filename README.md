@@ -49,10 +49,10 @@ Or, for cloud foundry foundations
 
 ## Options
 Options and configuration are contained in the "opcon.ini" file.  It
-is broken into 2 sections - "global" (really, for BOSH) and "auth".
+is broken into 2 sections - "bosh" and "auth".
 
 Options are specified below, with any default value indicated first.
-### global/bosh options
+### bosh options
 - director\_url=_https:/10.100.10.10:25555_ - - the full URL for the bosh director
 - verify_tls=[False, True] -- disable/enable TLS validation (meant for debugging)
 - user=_admin_ -- username for the BOSH login

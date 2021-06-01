@@ -21,7 +21,7 @@
       // alert(dep + "->" + action + "(" + vmi + ")")
       var doit = confirm("really " + action + " " + vmi + "?")
       if (doit == true) {
-	  $.get("/vm_control?deployment=" + dep + "&vmi=" + vmi + "&action=" + action)
+	  $.get("/vm_control?deployment=" + "{{ deployment_name }}" + "&vmi=" + vmi + "&action=" + action)
       }
   }
 </script>

@@ -98,6 +98,7 @@ class Director(object):
             verify=self.verify_tls)
         if not r.ok:
             print(f"oauth request({r.status_code}) {r.content}")
+            sys.exit(1)
         j = r.json()
         self.oauth = j.copy()
         # update auth headers in persisted session

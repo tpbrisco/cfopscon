@@ -83,8 +83,8 @@ def login_callback():
         token_url,
         headers=headers,
         data=body,
-        auth=(user_auth.ua_lib.google_client_id,
-              user_auth.ua_lib.google_client_secret))
+        auth=(user_auth.ua_lib.client_id,
+              user_auth.ua_lib.client_secret))
     # parse tokens
     user_auth.ua_lib.client.parse_request_body_response(json.dumps(token_r.json()))
     # set up user as logged in

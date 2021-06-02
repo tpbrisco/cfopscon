@@ -11,16 +11,16 @@ import sys
 class UserAuth(object):
     def __init__(self, appopt):
         # GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
-        (self.google_client_id,
-         self.google_client_secret,
+        (self.client_id,
+         self.client_secret,
          self.base_url) = appopt.config['USER_AUTH_DATA'].split(',')
         self.debug = appopt.config['USER_AUTH_DEBUG']
         self.auth_type = 'oidc'  # for app.py:login() method
         self.auth_brand = 'Google'
         self.discovery = 'https://accounts.google.com/.well-known/openid-configuration'
-        self.client_secret = uuid.uuid4().hex
+        # self.client_secret = uuid.uuid4().hex
         self.ug_hash = dict()   # who has logged in
-        self.client = WebApplicationClient(self.google_client_id)
+        self.client = WebApplicationClient(self.client_id)
         r = requests.get(self.discovery)
         if not r.ok:
             print("Error discovering Google endpoints: {}".format(r.text), file=sys.stderr)

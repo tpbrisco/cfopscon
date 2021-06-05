@@ -56,6 +56,9 @@ class config(object):
             for k in self.config:
                 print(f'\t{k}:{self.config[k]}')
 
+    def __repr__(self):
+        return self.config
+
     def get(self, kw):
         # print("Config.Get {}: {}".format(kw, self.config[kw]))
         if kw in self.config:

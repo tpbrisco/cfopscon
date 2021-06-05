@@ -85,14 +85,21 @@ def login_callback():
         data=body,
         auth=(user_auth.ua_lib.client_id,
               user_auth.ua_lib.client_secret))
+    if not token_r.ok:
+        print("Failed to get token from {}: {}".format(token_url, token_r.text), file=sys.stderr)
+        return redirect(url_for('index'))
     # parse tokens
     user_auth.ua_lib.client.parse_request_body_response(json.dumps(token_r.json()))
     # set up user as logged in
     userinfo_url = user_auth.ua_lib.oidc_config['userinfo_endpoint']
     uri, headers, body = user_auth.ua_lib.client.add_token(userinfo_url)
     userinfo_r = requests.get(uri, headers=headers, data=body)
+    if not userinfo_r.ok:
+        print("Failed to get userinfo from {}: {}".format(uri, userinfo_r.text), file=sys.stderr)
+        return redirect(url_for('index'))
     userinfo_data = userinfo_r.json()
-    # print("userinfo_data: {}".format(json.dumps(userinfo_data, indent=2)))
+    if user_auth.ua_lib.debug:
+        print("userinfo_data: {}".format(json.dumps(userinfo_data, indent=2)))
     user_auth.login_user(userinfo_data['email'], userinfo_data['given_name'])
     # now that we've completed the user login, redirect back to "next"
     return redirect(url_for('index'))

@@ -70,7 +70,6 @@ def load_user(id):
 @app.route('/_callback', methods=['GET'])
 def login_callback():
     auth_type = user_auth.ua_lib.auth_type
-    auth_debug = user_auth.ua_lib.debug
     if auth_type != 'oidc':
         print("got callback for non-oidc auth agent")
         return Response('not oidc enabled', 401)
@@ -81,6 +80,7 @@ def login_callback():
     if not code:
         print("got callback with no code")
         return Response('code is missing', 401)
+    # have auth code, next link - get token, and redirect there
     token_endpoint = user_auth.ua_lib.oidc_config['token_endpoint']
     token_url, headers, body = user_auth.ua_lib.client.prepare_token_request(
         token_endpoint,
@@ -97,22 +97,11 @@ def login_callback():
         print("Failed to get token from {}: {}".format(token_url, token_r.text))
         return redirect(url_for('index'))
     # parse tokens
-    if auth_debug:
-        print("Token response: {}".format(token_r.json()))
-    user_auth.ua_lib.client.parse_request_body_response(json.dumps(token_r.json()))
-    # set up user as logged in
-    userinfo_url = user_auth.ua_lib.oidc_config['userinfo_endpoint']
-    uri, headers, body = user_auth.ua_lib.client.add_token(userinfo_url)
-    userinfo_r = requests.get(uri, headers=headers, data=body)
-    if not userinfo_r.ok:
-        print("Failed to get userinfo from {}: {}".format(uri, userinfo_r.text), file=sys.stderr)
-        return redirect(url_for('index'))
-    userinfo_data = userinfo_r.json()
-    if auth_debug:
-        print("userinfo_data: {}".format(json.dumps(userinfo_data, indent=2)))
-    user_auth.login_user(userinfo_data['email'], userinfo_data['given_name'])
+    token_dict = token_r.json()
+    username = user_auth.ua_lib.get_user_from_token(token_dict['id_token'])
+    user_auth.login_user(username, '')
     # now that we've completed the user login, redirect back to "next"
-    return redirect(url_for('index'))
+    return redirect(next)
 
 
 @app.route('/login', methods=['GET', 'POST'])

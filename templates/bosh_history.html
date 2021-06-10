@@ -17,14 +17,13 @@
   <table class="table table-striped table-bordered">
     <thead><tr><th>ID</th><th>State</th><th>Desc</th><th>Timestamp</th>
 	<th>Result</th><th>User</th><th>Deployment</th>
-        <th colspan="4">Data</th></tr></thead>
+        <th colspan="3">Data</th></tr></thead>
     <tbody>
       {% for task in tasks %}
       <tr><td>{{ task.id }}</td><td>{{ task.state }}</td><td>{{ task.description }}</td>
 	<td>{{ task.timestamp |datetime}}</td>
 	<td>{{ task.result }}</td><td>{{ task.user }}</td>
 	<td>{{ task.deployment }}</td>
-	<td><a href="/bosh/tasks/{{ task.id }}/output?type=result" target="_blank">Results</a></td>
 	<td><a href="/bosh/tasks/{{ task.id }}/output?type=debug" target="_blank">Debug</a></td>
 	<td><a href="/bosh/tasks/{{ task.id }}/output?type=event" target="_blank">Event</a></td>
 	<td><a href="javascript:cancelTask({{ task.id }}, '{{ task.state }}')">Cancel</a></td>

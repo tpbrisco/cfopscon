@@ -4,7 +4,8 @@ from flask import (
     url_for)
 from oauthlib.oauth2 import WebApplicationClient
 import requests
-import uuid
+import base64
+import json
 import sys
 
 
@@ -18,7 +19,6 @@ class UserAuth(object):
         self.auth_type = 'oidc'  # for app.py:login() method
         self.auth_brand = 'Google'
         self.discovery = 'https://accounts.google.com/.well-known/openid-configuration'
-        # self.client_secret = uuid.uuid4().hex
         self.ug_hash = dict()   # who has logged in
         self.client = WebApplicationClient(self.client_id)
         r = requests.get(self.discovery)
@@ -42,3 +42,15 @@ class UserAuth(object):
         if username not in self.ug_hash:
             return None
         return username
+
+    def b64repad(self, token):
+        pad_len = len(token) % 4
+        if pad_len == 0:
+            return token
+        return token + "=" * pad_len
+
+    def get_user_from_token(self, token):
+        header, id_token, tail = token.split('.')
+        id_token = self.b64repad(id_token)
+        id_dict = json.loads(base64.b64decode(id_token))
+        return id_dict['email']

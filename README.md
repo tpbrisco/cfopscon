@@ -69,6 +69,7 @@ Options are specified below, with any default value indicated first.
   Should support "fake_auth" (~~local CSV?~~), ~~UAA auth~~, and maybe
   3rd-party OAuth2 endpoints.
 - reauthentication timeouts need to occur for oauth/google - verify in auth/module
+- add the "force" flag to the VM recreate in bosh_vitals
 - add the ability to run existing bosh tasks
 - ~~from bosh_tasks - remove data-results column (that's in the main table)~~
 - user activity tracking - log who-did-what

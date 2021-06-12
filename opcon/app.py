@@ -247,10 +247,35 @@ def cancel_task(taskid):
     task_url = '/task/{}'.format(taskid)
     r = director.session.delete(director.bosh_url + task_url)
     if r.ok:
-        return Response("{}", status_code=r.status)
+        return Response("{}", status=r.status)
     else:
-        return Response(r.text, status_code=r.status)
+        return Response(r.text, status=r.status)
 
+
+@app.route("/bosh/deployment/errands", methods=['GET'])
+@user_auth.flask_login_required
+def get_deployment_errands():
+    deployment = request.args.get('deployment')
+    if len(director.deployments) == 0:
+        return render_template('index.html', director=director)
+    if deployment is None:
+        deployment = director.deployments[0]
+    errands = director.get_deployment_errands(deployment)
+    return render_template('bosh_errands.html',
+                           deployment_name=deployment,
+                           deployments=director.deployments,
+                           deployment_errands=errands)
+
+
+@app.route("/bosh/deployment/<deployment>/errand/<errand>/run")
+@user_auth.flask_login_required
+def run_deployment_errand(deployment, errand):
+    running = director.run_deployment_errand(deployment, errand)
+    if running:
+        rcode = 200
+    else:
+        rcode = 400
+    return Response("{'running': '%s'}" % (running), status=rcode)
 
 @app.route("/bosh/deployment/vitals", methods=['GET'])
 @user_auth.flask_login_required
@@ -284,11 +309,11 @@ def vm_control():   # (deployment, vmi, action):
     inst_group, inst = vmi.split('/')
     if deployment is None or vmi is None or inst_group is None or inst is None:
         return Response("{'error': 'deployment, vm required (vm as vm/guid or vm/index)'}",
-                        status_code=400,
+                        status=400,
                         content_type='application/json')
     if action not in ['restart', 'recreate', 'stop', 'start']:
         return Response("{'error': 'action is required: restart,recreate,stop,start'}",
-                        status_code=400,
+                        status=400,
                         content_type='application/json')
     if skip_drain is None:
         skip_drain = False

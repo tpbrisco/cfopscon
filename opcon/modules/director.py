@@ -202,6 +202,56 @@ class Director(object):
         else:
             return {}
 
+    def get_deployment_errands(self, deployment):
+        '''get bosh errands for this deployment'''
+        if deployment not in self.deployments:
+            return None
+        errands_url = '%s/deployments/%s/errands' % (
+            self.bosh_url, deployment)
+        if self.debug:
+            print("fetching deployment errands", errands_url)
+        errands_resp = self.session.get(errands_url,
+                                        verify=self.verify_tls)
+        if not errands_resp.ok:
+            print("Error {} fetching {} errands: {}".format(
+                errands_resp.status_code,
+                deployment,
+                errands_resp.text))
+            return None
+        errand_dict = errands_resp.json()
+        errand_ary = list()
+        for e in errand_dict:
+            errand_ary.append(e['name'])
+        return errand_ary
+
+    def run_deployment_errand(self, deployment, errand_name):
+        '''run indicated errand for this deployment'''
+        if deployment not in self.deployments:
+            return None
+        errand_url = '{}/deployments/{}/errands/{}/runs'.format(
+            self.bosh_url,
+            deployment,
+            errand_name)
+        # very awkward to get the data in the format acceptable by the bosh api
+        errand_resp = self.session.post(errand_url,
+                                        verify=self.verify_tls,
+                                        allow_redirects=False,
+                                        headers={'Content-Type': 'application/json'},
+                                        data='{"instances": [], "keep-alive": false, "when-changed": false}')
+        if not errand_resp.status_code == 302:
+            print("error calling errand {} for {}: {}".format(
+                errand_name, deployment, errand_resp.text))
+            return False
+        # we should have the URL to follow for this
+        errand_results_url = urlparse(errand_resp.headers['Location']).path
+        if self.debug:
+            print("errand talk:", errand_results_url)
+        # this doesn't seem to actually leave output cleanly
+        # self.pending_tasks.append(task_logs(TASK_LOGS,
+        #                                     "%s %s" % (deployment, errand_name),
+        #                                     errand_results_url))
+        return True
+
     def get_deployment_vitals(self, deployment):
         '''get bosh vms --vitals'''
         if deployment not in self.deployments:

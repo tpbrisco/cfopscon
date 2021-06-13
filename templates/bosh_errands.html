@@ -9,7 +9,7 @@
 	  $.get("/bosh/deployment/" + $("#deployment_list").val() + "/jobs", function(data, status){
 	      $("#deployment_jobs").empty("li");
 	      for (i=0; i < data.length; i++) {
-		  $("#deployment_jobs").append("<option>"+data[i]+"</option>");
+		  $("#deployment_jobs").append("<option " + selected + ">"+data[i]+"</option>");
 	      }
 	  })
       })
@@ -32,7 +32,11 @@
       <div class="form-group col-md-6">
 	   <select class="form-control" id="deployment_list" name="deployment">
 	     {% for d in deployments %}
+	     {% if deployment_name == d %}
+	     <option selected> {{ d }}</option>
+	     {% else %}
 	     <option>{{ d }}</option>
+	     {% endif %}
 	     {% endfor %}
 	   </select>
       </div>

@@ -32,7 +32,11 @@
       <div class="form-group col-md-6">
 	   <select class="form-control" id="deployment_list" name="deployment">
 	     {% for d in deployments %}
+	     {% if deployment_name == d %}
+	     <option selected> {{ d }}</option>
+	     {% else %}
 	     <option>{{ d }}</option>
+	     {% endif %}
 	     {% endfor %}
 	   </select>
       </div>

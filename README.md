@@ -24,7 +24,7 @@ Common BOSH operations are supported
 * Task results and controls - task cancelling, and results/debug/events logs
 * Run deployment errands
 
-Whle currently bosh-centric, plans include extending the model for
+While currently bosh-centric, plans include extending the model for
 common cloud foundry operational tasks.  See "TO DO' for planned work.
 
 ## Deployment
@@ -64,6 +64,7 @@ Options are specified below, with any default value indicated first.
   - type=MOD -- required, indicates loadable module
   - module=_module.py_ - module located in modules/ area
   - data=_mod\_specific_ - module-specific comma-seperated list
+  - debug=_False_ - module-specific debugging
 
 ## TO DO
 - Implement authentication for access to the system; 
@@ -71,7 +72,7 @@ Options are specified below, with any default value indicated first.
   3rd-party OAuth2 endpoints.
 - reauthentication timeouts need to occur for oauth/google - verify in auth/module
 - add the "force" flag to the VM recreate in bosh_vitals
-- ~~add the ability to run existing bosh tasks~~
+- ~~add the ability to run existing bosh errands~~
 - improve bosh tasks/errands output collection
 - allow errand flags (e.g. specify the instance)
 - ~~from bosh_tasks - remove data-results column (that's in the main table)~~

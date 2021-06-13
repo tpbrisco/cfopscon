@@ -141,6 +141,15 @@ class Director(object):
         else:
             return list()
 
+    def get_deployment_jobs_filtered(self, deployment, filter):
+        '''return a list of jobs from the deployment, filtered according to filter prefix'''
+        jobs = self.get_deployment_jobs(deployment)
+        filtered = list()
+        for j in jobs:
+            if j.startswith(filter):
+                filtered.append(j)
+        return filtered
+
     def submit_logs_job(self, deployment, jobs):
         '''Submit a job to BOSH to fetch logs'''
         logs_url = "%s/deployments/%s/jobs/%s/logs" % (

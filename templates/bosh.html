@@ -24,7 +24,11 @@
 	  {{ form.deployment.label }}
 	  <select class="form-control"  id="deployment_list" name="deployment">
 	    {% for d in deployments %}
-	    <option>{{ d }}</option>
+	     {% if deployment_name == d %}
+	     <option selected> {{ d }}</option>
+	     {% else %}
+	     <option>{{ d }}</option>
+	     {% endif %}
 	    {% endfor %}
 	  </select>
 	</div>

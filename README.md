@@ -22,8 +22,9 @@ Common BOSH operations are supported
 * retrieving logs from VMs ("bosh logs")
 * VM "vitals" ("bosh vms --vitals") with restart/stop/start/recreate operations, 
 * Task results and controls - task cancelling, and results/debug/events logs
+* Run deployment errands
 
-Whle current bosh-centric, plans include extending the model for
+Whle currently bosh-centric, plans include extending the model for
 common cloud foundry operational tasks.  See "TO DO' for planned work.
 
 ## Deployment
@@ -71,7 +72,8 @@ Options are specified below, with any default value indicated first.
 - reauthentication timeouts need to occur for oauth/google - verify in auth/module
 - add the "force" flag to the VM recreate in bosh_vitals
 - ~~add the ability to run existing bosh tasks~~
-- improve bosh tasks output collection
+- improve bosh tasks/errands output collection
+- allow errand flags (e.g. specify the instance)
 - ~~from bosh_tasks - remove data-results column (that's in the main table)~~
 - user activity tracking - log who-did-what
 - ~~cancel tasks~~

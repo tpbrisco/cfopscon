@@ -1,5 +1,6 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 import sys
+import time
 
 # UserAuth must be defined for loadable modules to work
 # Methods:
@@ -19,7 +20,7 @@ class UserAuth(object):
                 if user in self.uc_hash:
                     print("User ({}) already exists".format(user))
                     sys.exit(1)
-                self.uc_hash[user] = phash
+                self.uc_hash[user] = {"time": 0, "hash": phash}
                 print("adding {}/{}".format(user, phash))
         return
 
@@ -30,10 +31,11 @@ class UserAuth(object):
             print("no user {} found".format(username))
             return False
         try:
-            if check_password_hash(self.uc_hash[username], password):
+            if check_password_hash(self.uc_hash[username]['hash'], password):
+                self.uc_hash[username]['time'] = time.time() + 3600
                 return True
         except TypeError as e:
-            print("could not check hash {}".format(self.uc_hash[username]))
+            print("could not check hash {}".format(self.uc_hash[username]['hash']))
             print("Error {}".format(e))
         return False
 
@@ -43,4 +45,6 @@ class UserAuth(object):
         if username not in self.uc_hash:
             print("user_loader() returns None")
             return None
-        return username
+        if self.uc_hash[username]['time'] >= time.time():
+            return username
+        return None

@@ -99,7 +99,7 @@ def login_callback():
     # parse tokens
     token_dict = token_r.json()
     username = user_auth.ua_lib.get_user_from_token(token_dict['id_token'])
-    user_auth.login_user(username, '')
+    user_auth.login_user(username, token_dict)
     # now that we've completed the user login, redirect back to "next"
     return redirect(next)
 

@@ -57,34 +57,40 @@ class user_authentication(object):
     def logout_user(self):
         self.flask_logout_user()
 
-    def login_user(self, username, password):
+    def login_user(self, username, param):
         '''initiate user login'''
         if self.ua_lib.auth_type == 'oidc':
-            ok_user = User(username)
-            ok_user.is_authenticated = True
-            ok_user.is_anonymous = False
-            ok_user.is_active = True
-            ok_user.debug = self.debug
-            if self.debug:
-                print("User:{} logged in".format(ok_user))
-            self.flask_login_user(ok_user,
-                                  duration=datetime.timedelta(hours=1))
-            return ok_user
-        if self.ua_lib.user_auth(username, password):
-            ok_user = User(username)
-            ok_user.is_authenticated = True
-            ok_user.is_anonymous = False
-            ok_user.is_active = True
-            ok_user.debug = self.debug
-            if self.debug:
-                print("User: {} logged in".format(ok_user))
-            self.flask_login_user(ok_user,
-                                  duration=datetime.timedelta(hours=1))
-            return ok_user
+            if self.ua_lib.user_auth(username, param):
+                ok_user = User(username)
+                ok_user.is_authenticated = True
+                ok_user.is_anonymous = False
+                ok_user.is_active = True
+                ok_user.debug = self.debug
+                if self.debug:
+                    print("User:{} logged in".format(ok_user))
+                self.flask_login_user(ok_user,
+                                    duration=datetime.timedelta(hours=1))
+                return ok_user
+            return None
+        if self.ua_lib.auth_type == 'userpass':
+            if self.ua_lib.user_auth(username, param):
+                ok_user = User(username)
+                ok_user.is_authenticated = True
+                ok_user.is_anonymous = False
+                ok_user.is_active = True
+                ok_user.debug = self.debug
+                if self.debug:
+                    print("User: {} logged in".format(ok_user))
+                self.flask_login_user(ok_user,
+                                      duration=datetime.timedelta(hours=1))
+                return ok_user
+            return None
         return None
 
     def user_loader(self, id):
         username = self.ua_lib.user_loader(id)
+        if username is None:
+            return None
         ok_user = User(username)
         ok_user.is_authenticated = True
         ok_user.is_anonymous = False

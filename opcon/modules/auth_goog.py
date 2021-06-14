@@ -7,6 +7,7 @@ import requests
 import base64
 import json
 import sys
+import time
 
 
 class UserAuth(object):
@@ -31,17 +32,28 @@ class UserAuth(object):
             redirect_uri=self.base_url + '/_callback',
             scope=["openid", "email", "profile"])
 
-    def user_auth(self, username, password):
+    def user_auth(self, username, token_d):
         # real auth is done in app.py:login_callback(), and user token fetched from there
-        self.ug_hash[username] = True
+        header, id_token, tail = token_d['id_token'].split('.')
+        id_token = self.b64repad(id_token)
+        id_dict = json.loads(base64.b64decode(id_token))
+        self.ug_hash[username] = id_dict['exp']
+        if self.debug:
+            print("oidc user_auth({}) good until {}".format(username, self.ug_hash[username]))
         return True
 
     def user_loader(self, username):
+        username = username.decode('utf-8')
         if self.debug:
-            print("user_loader({})".format(username))
+            print("trying user_loader({}) in user hash: {}".format(
+                username, username in self.ug_hash))
         if username not in self.ug_hash:
             return None
-        return username
+        if self.debug:
+            print("user_loader({}) expires at {}".format(username, self.ug_hash[username]))
+        if self.ug_hash[username] >= int(time.time()):
+            return username
+        return None
 
     def b64repad(self, token):
         pad_len = len(token) % 4

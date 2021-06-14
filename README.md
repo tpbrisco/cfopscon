@@ -72,12 +72,9 @@ Options are specified below, with any default value indicated first.
   3rd-party OAuth2 endpoints.
 - reauthentication timeouts need to occur for oauth/google - verify in auth/module
 - add the "force" flag to the VM recreate in bosh_vitals
-- ~~add the ability to run existing bosh errands~~
 - improve bosh tasks/errands output collection
 - allow errand flags (e.g. specify the instance)
-- ~~from bosh_tasks - remove data-results column (that's in the main table)~~
 - user activity tracking - log who-did-what
-- ~~cancel tasks~~
 - remove passwords from INI file
 - home page statistics -- include "interesting" stats about BOSH, CF
 - Investigate and support bosh-cli-like syntax "bosh logs compute" for
@@ -89,3 +86,6 @@ Options are specified below, with any default value indicated first.
 - ~~recreate specific VMs~~
 - ~~show VM health state (bosh vms --vitals)~~
 - ~~Implement auto-fill for BOSH deployment jobs~~
+- ~~add the ability to run existing bosh errands~~
+- ~~from bosh_tasks - remove data-results column (that's in the main table)~~
+- ~~cancel tasks~~

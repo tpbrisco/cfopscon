@@ -67,14 +67,9 @@ Options are specified below, with any default value indicated first.
   - debug=_False_ - module-specific debugging
 
 ## TO DO
-- Implement authentication for access to the system; 
-  Should support "fake_auth" (~~local CSV?~~), ~~UAA auth~~, and maybe
-  3rd-party OAuth2 endpoints.
-- reauthentication timeouts need to occur for oauth/google - verify in auth/module
 - add the "force" flag to the VM recreate in bosh_vitals
-- improve bosh tasks/errands output collection
+- improve bosh tasks/errands output collection - auto-refresh events/debug output?
 - allow errand flags (e.g. specify the instance)
-- user activity tracking - log who-did-what
 - remove passwords from INI file
 - home page statistics -- include "interesting" stats about BOSH, CF
 - Investigate and support bosh-cli-like syntax "bosh logs compute" for
@@ -83,6 +78,9 @@ Options are specified below, with any default value indicated first.
   job to complete for logs download - put a status update.
   Presumably jQuery, and use the /deployments/:deployment/instances API~~
 - restart CF brokers
+- ~~reauthentication timeouts need to occur for oauth/google - verify in auth/module~~
+- ~~Implement authentication for access to the system (CSV, 3rd party -  e.g google)~~
+- ~~user activity tracking - log who-did-what~~
 - ~~recreate specific VMs~~
 - ~~show VM health state (bosh vms --vitals)~~
 - ~~Implement auto-fill for BOSH deployment jobs~~

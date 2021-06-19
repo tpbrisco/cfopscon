@@ -10,6 +10,7 @@ from flask import (
     Response,
     redirect,
     stream_with_context,
+    has_request_context,
     flash,
     url_for
 )
@@ -21,6 +22,7 @@ import os
 import sys
 import time
 import json
+import functools
 
 # see "is_gunicorn" comments below for confusion with gunicorn
 # gunicorn gets very confused with command-line parsing options, even if
@@ -54,9 +56,27 @@ user_auth.ua_login_manager.init_app(app)
 user_auth.ua_login_manager.login_view = 'login'
 
 
+def log_access(fn):
+    @functools.wraps(fn)
+    def log_url_access(*args, **kwargs):
+        if has_request_context():
+            query=''
+            if len(request.query_string):
+                query = '?{}'.format(request.query_string)
+            print('access {} {} \"{} {}{}\"'.format(
+                request.remote_addr,
+                user_auth.current_user(),
+                request.method,
+                request.path,
+                query))
+        return fn(*args, **kwargs)
+    return log_url_access
+
+
 @app.route("/index.html")
 @app.route("/")
 @user_auth.flask_login_required
+@log_access
 def index():
     return render_template("index.html", director=director,
                            stats=director.get_director_stats())
@@ -158,6 +178,7 @@ def login_redirect():
 
 
 @app.route('/logout')
+@log_access
 def logout():
     user_auth.logout_user()
     return redirect(url_for('index'))
@@ -165,6 +186,7 @@ def logout():
 
 @app.route("/bosh", methods=['GET', 'POST'])
 @user_auth.flask_login_required
+@log_access
 def bosh_logs():
     if len(director.deployments) == 0:
         return render_template('index.html', director=director)
@@ -196,6 +218,7 @@ def format_datetime(value):
 
 @app.route("/bosh/tasks", methods=['GET'])
 @user_auth.flask_login_required
+@log_access
 def get_tasks():
     limit = request.args.get('limit', default=0, type=int)
     # return Response(director.get_job_history(limit),
@@ -206,6 +229,7 @@ def get_tasks():
 
 @app.route("/bosh/tasks/<taskid>", methods=['GET'])
 @user_auth.flask_login_required
+@log_access
 def download_logs(taskid):
     t = None
     for t in director.pending_tasks:
@@ -226,6 +250,7 @@ def download_logs(taskid):
 
 @app.route("/bosh/tasks/<taskid>/output", methods=['GET'])
 @user_auth.flask_login_required
+@log_access
 def get_task_output(taskid):
     output_type = request.args.get('type')
     if output_type == '':
@@ -243,6 +268,7 @@ def get_task_output(taskid):
 
 @app.route("/bosh/tasks/<taskid>/cancel", methods=['GET'])
 @user_auth.flask_login_required
+@log_access
 def cancel_task(taskid):
     task_url = '/task/{}'.format(taskid)
     r = director.session.delete(director.bosh_url + task_url)
@@ -254,6 +280,7 @@ def cancel_task(taskid):
 
 @app.route("/bosh/deployment/errands", methods=['GET'])
 @user_auth.flask_login_required
+@log_access
 def get_deployment_errands():
     deployment = request.args.get('deployment')
     if len(director.deployments) == 0:
@@ -269,6 +296,7 @@ def get_deployment_errands():
 
 @app.route("/bosh/deployment/<deployment>/errand/<errand>/run")
 @user_auth.flask_login_required
+@log_access
 def run_deployment_errand(deployment, errand):
     running = director.run_deployment_errand(deployment, errand)
     if running:
@@ -277,8 +305,10 @@ def run_deployment_errand(deployment, errand):
         rcode = 400
     return Response("{'running': '%s'}" % (running), status=rcode)
 
+
 @app.route("/bosh/deployment/vitals", methods=['GET'])
 @user_auth.flask_login_required
+@log_access
 def get_deployment_vitals_default():
     deployment = request.args.get('deployment')
     if len(director.deployments) == 0:
@@ -294,6 +324,7 @@ def get_deployment_vitals_default():
 
 @app.route("/bosh/deployment/<deployment>/jobs", methods=['GET'])
 @user_auth.flask_login_required
+@log_access
 def get_deployment_jobs(deployment):
     return Response(json.dumps(director.get_deployment_jobs(deployment)),
                     content_type='application/json')
@@ -301,6 +332,7 @@ def get_deployment_jobs(deployment):
 
 @app.route('/vm_control', methods=['GET'])
 @user_auth.flask_login_required
+@log_access
 def vm_control():   # (deployment, vmi, action):
     deployment = request.args.get('deployment')
     vmi = request.args.get('vmi')

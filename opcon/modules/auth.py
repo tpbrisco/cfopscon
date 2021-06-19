@@ -54,6 +54,9 @@ class user_authentication(object):
         self.flask_current_user = flask_login.current_user
         self.flask_login_user = flask_login.login_user
 
+    def current_user(self):
+        return self.flask_current_user.username.decode('utf-8')
+
     def logout_user(self):
         self.flask_logout_user()
 

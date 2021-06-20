@@ -20,7 +20,7 @@ access the appropriate APIs.
 ## Current Status
 Common BOSH operations are supported
 * retrieving logs from VMs ("bosh logs")
-* VM "vitals" ("bosh vms --vitals") with restart/stop/start/recreate operations, 
+* VM "vitals" ("bosh vms --vitals") with restart/stop/start/recreate operations,
 * Task results and controls - task cancelling, and results/debug/events logs
 * Run deployment errands
 
@@ -29,7 +29,7 @@ common cloud foundry operational tasks.  See "TO DO' for planned work.
 
 ## Deployment
 The _CF Operator's Console_ is a Flask application that can be ran
-from the desktop via Flask commands (assuming BOSH director access), 
+from the desktop via Flask commands (assuming BOSH director access),
 as well as under gunicorn to support the cf-push model of deployment.
 
 To run from the desktop:
@@ -65,6 +65,13 @@ Options are specified below, with any default value indicated first.
   - module=_module.py_ - module located in modules/ area
   - data=_mod\_specific_ - module-specific comma-seperated list
   - debug=_False_ - module-specific debugging
+
+## Limitations
+- running multiple instances of the process running doesn't work
+>  The user database is an in-RAM database, so of course moving across
+>  CF instances doesn't work.  An alternatives involve external K/V
+>  stores, and it's not clear if usage will be such that that is worth
+>  the work.
 
 ## TO DO
 - add the "force" flag to the VM recreate in bosh_vitals

@@ -60,11 +60,12 @@ def log_access(fn):
     @functools.wraps(fn)
     def log_url_access(*args, **kwargs):
         if has_request_context():
-            query=''
+            query = ''
             if len(request.query_string):
                 query = '?{}'.format(request.query_string)
-            print('access {} {} \"{} {}{}\"'.format(
+            print('access {} {} {} \"{} {}{}\"'.format(
                 request.remote_addr,
+                time.strftime('[%Y/%m/%d %H:%M:%ST%z]', time.localtime()),
                 user_auth.current_user(),
                 request.method,
                 request.path,

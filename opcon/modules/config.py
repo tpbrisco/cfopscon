@@ -50,8 +50,7 @@ class config(object):
             if options.bosh_pass:
                 self.config['o_bosh_pass'] = options.bosh_pass
         # parsing done
-        # if 'o_debug' in self.config and self.config['o_debug']:
-        if True:
+        if 'o_debug' in self.config and self.config['o_debug']:
             print("Configuration")
             for k in self.config:
                 print(f'\t{k}:{self.config[k]}')

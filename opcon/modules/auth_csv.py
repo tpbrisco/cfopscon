@@ -16,6 +16,8 @@ class UserAuth(object):
         self.auth_brand = 'CSV, FTW'  # branding info
         with open(self.uc_csvfile, 'r') as f:
             for line in f:
+                if len(line) == 0:
+                    continue
                 user, phash = line.strip().split(',')
                 if user in self.uc_hash:
                     print("User ({}) already exists".format(user))

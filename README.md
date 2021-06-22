@@ -49,8 +49,9 @@ Or, for cloud foundry foundations
 ```
 
 ## Options
-Options and configuration are contained in the "opcon.ini" file.  It
-is broken into 2 sections - "bosh" and "auth".
+Options and configuration are contained in the "opcon.ini" file (or
+file specified by the CONFIG_FILE environment variable).  It is broken
+into 2 sections - "bosh" and "auth".
 
 Options are specified below, with any default value indicated first.
 ### bosh options

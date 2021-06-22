@@ -42,7 +42,8 @@ scheduler.init_app(app)
 scheduler.start()
 
 # main configuration dictionary
-config = config.config(command_line=not is_gunicorn, config_file='opcon.ini')
+config = config.config(command_line=not is_gunicorn,
+                       config_file=os.getenv('CONFIG_FILE', 'opcon.ini'))
 if config.get('o_debug'):
     app.config['DEBUG'] = config.get('o_debug')
 if config.get('o_auth_type'):

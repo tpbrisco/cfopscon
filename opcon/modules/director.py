@@ -41,6 +41,8 @@ class Director(object):
         self.bosh_url = url
         self.bosh_user = user
         self.bosh_pass = password
+
+    def connect(self):
         # get BOSH session initialization info
         init_r = requests.get(self.bosh_url + "/info",
                               verify=self.verify_tls)

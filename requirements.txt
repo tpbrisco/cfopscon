@@ -8,3 +8,4 @@ WTForms
 requests
 gunicorn
 oauthlib
+jwt

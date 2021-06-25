@@ -57,7 +57,7 @@ Options are specified below, with any default value indicated first.
 ### bosh options
 - director\_url=_https:/10.100.10.10:25555_ - - the full URL for the bosh director
 - verify_tls=[False, True] -- disable/enable TLS validation (meant for debugging)
-- user=[_admin_, $BOSH_USER] -- username for the BOSH login
+- user=[_admin_, $BOSH_USERNAME] -- username for the BOSH login
 - pass=[_magic_, $BOSH_PASSWORD] -- password for the BOSH login
 - debug=[False, True] -- disable/enable debugging for the director code
 

@@ -1,5 +1,6 @@
 
 import configparser
+import os
 
 
 class config(object):
@@ -14,8 +15,8 @@ class config(object):
                 self.config['o_debug'] = g.getboolean('debug', fallback=False)
                 self.config['o_director_url'] = g.get('director_url')
                 self.config['o_verify_tls'] = g.getboolean('verify_tls', fallback=True)
-                self.config['o_bosh_user'] = g.get('user')
-                self.config['o_bosh_pass'] = g.get('pass')
+                self.config['o_bosh_user'] = g.get('user', os.getenv('BOSH_USER', ''))
+                self.config['o_bosh_pass'] = g.get('pass', os.getenv('BOSH_PASSWORD', ''))
             if 'auth' in configini:
                 a = configini['auth']
                 self.config['o_auth_type'] = a.get('type')

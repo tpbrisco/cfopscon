@@ -12,9 +12,6 @@ class config(object):
             configini.read(kwargs['config_file'])
             if 'bosh' in configini:
                 g = configini['bosh']
-                print("BOSH_USERNAME={} BOSH_PASSWORD={}".format(
-                    os.getenv('BOSH_USERNAME'),
-                    os.getenv('BOSH_PASSWORD')))
                 self.config['o_debug'] = g.getboolean('debug', fallback=False)
                 self.config['o_director_url'] = g.get('director_url')
                 self.config['o_verify_tls'] = g.getboolean('verify_tls',

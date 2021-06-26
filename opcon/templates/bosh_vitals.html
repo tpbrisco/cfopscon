@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}BOSH Vitals {{ deployment_name }}{% endblock %}
+{% block content %}
+<script src="{{bootstrap_find_resource('jquery.js', cdn='jquery')}}"></script>
+<script>
+  $(document).ready(function() {
+      $("#deployment_list").click(function(){
+	  // alert("deployment: " + $("#deployment_list").val());
+	  $.get("/bosh/deployment/" + $("#deployment_list").val() + "/jobs", function(data, status){
+	      $("#deployment_jobs").empty("li");
+	      for (i=0; i < data.length; i++) {
+		  $("#deployment_jobs").append("<option>"+data[i]+"</option>");
+	      }
+	  })
+      })
+  })
+  </script>
+<script>
+  function clickedOn(vmi, action) {
+      var dep = $("#deployment_list").val()
+      // alert(dep + "->" + action + "(" + vmi + ")")
+      var doit = confirm("really " + action + " " + vmi + "?")
+      if (doit == true) {
+	  $.get("/vm_control?deployment=" + "{{ deployment_name }}" + "&vmi=" + vmi + "&action=" + action)
+      }
+  }
+</script>
+<div class="col-md-8 offset-md-2">
+  <h1>BOSH vitals {{ deployment_name }}</h1>
+  <form class="form form-horizontal" method="GET" action="">
+    <div class="form-row">
+      <div class="form-group col-md-6">
+	   <select class="form-control" id="deployment_list" name="deployment">
+	     {% for d in deployments %}
+	     {% if deployment_name == d %}
+	     <option selected> {{ d }}</option>
+	     {% else %}
+	     <option>{{ d }}</option>
+	     {% endif %}
+	     {% endfor %}
+	   </select>
+      </div>
+    </div>
+    <div class="form-group col-md-6">
+      <button type="submit" class="btn btn-primary">switch deployment</button>
+    </div>
+  </form>
+  <table class="table table-striped table-bordered">
+    <thead><tr><th>Name</th><th>Instance</th><th>IP</th><th colspan=3>CPU</th>
+	<th colspan=3>Load</th><th>Mem% Used</th><th>Swap</th>
+	<th>Resurrection Paused?</th>
+	<th>State</th>
+	<th>Actions</th></thead>
+    <thead><tr><th></th><th></th><th><th>Sys</th><th>User</th><th>Wait</th>
+    <th>1min</th><th>3min</th><th>5min</th></thead>
+    {% for inst in deployment_vitals %}
+    {% if inst.vm_cid is not none %}
+    <tr><td>{{ inst.job_name }}</td><td>{{ inst.id }}</td>
+      <td>{{ inst.ips[0] }}</td><td>{{ inst.vitals.cpu.sys }}</td>
+      <td>{{ inst.vitals.cpu.user }}</td><td>{{ inst.vitals.cpu.wait	}}</td>
+      <td>{{ inst.vitals.load[0] }}</td><td>{{ inst.vitals.load[1] }}</td><td>{{ inst.vitals.load[2] }}</td>
+      <td>{{ inst.vitals.mem.percent }}%</td>
+      <td>{{ inst.vitals.swap.percent }}%</td>
+      <td>{{ inst.resurrection_paused }}</td>
+      <td>{{ inst.job_state }}</td>
+      <td>
+	<button type="button" class="btn-warning"
+		onclick="clickedOn( '{{inst.job_name}}/{{inst.id}}', 'restart' );"
+		vm="{{inst.job_name}}/{{inst.id}}">Restart</button>
+	<button type="button" class="btn-warning"
+		onclick="clickedOn( '{{inst.job_name}}/{{inst.id}}', 'stop' );"
+		vm="{{inst.job_name}}/{{inst.id}}">Stop</button>
+	<button type="button" class="btn-primary"
+		onclick="clickedOn( '{{inst.job_name}}/{{inst.id}}', 'start' );"
+		vm="{{inst.job_name}}/{{inst.id}}">Start</button>
+	<button type="button" class="btn-danger"
+		onclick="clickedOn( '{{inst.job_name}}/{{inst.id}}', 'recreate' );"
+		vm="{{inst.job_name}}/{{inst.id}}">Recreate</button>
+      </td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

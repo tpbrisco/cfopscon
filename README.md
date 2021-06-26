@@ -74,6 +74,14 @@ Options are specified below, with any default value indicated first.
 >  stores, and it's not clear if usage will be such that that is worth
 >  the work.
 
+## Tests
+cfopscon uses the nose2 for unittest running.  From the top-level
+directory
+```bash
+% nose2 -v tests
+```
+should yield predictable results.
+
 ## TO DO
 - add the "force" flag to the VM recreate in bosh_vitals
 - improve bosh tasks/errands output collection - auto-refresh events/debug output?

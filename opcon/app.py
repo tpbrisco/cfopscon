@@ -375,6 +375,8 @@ director = director.Director(config.get('o_director_url'),
                              debug=config.get('o_debug'),
                              verify_tls=config.get('o_verify_tls'))
 director.connect()
+director.login()
+director.get_deployments()
 print("scheduled oauth update in %d seconds" % (
     director.oauth_token_expires() - 30))
 scheduler.add_job(id='oauth-refresh',

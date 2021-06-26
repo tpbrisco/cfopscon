@@ -41,6 +41,7 @@ class Director(object):
         self.bosh_url = url
         self.bosh_user = user
         self.bosh_pass = password
+        self.pending_tasks = list()
 
     def connect(self):
         # get BOSH session initialization info
@@ -53,9 +54,9 @@ class Director(object):
         # cache key URLs
         self.uaa_url = init_json['user_authentication']['options']['url']
         # set up internal cached data structures
+
+    def login(self):
         self.init_auth(self.uaa_url, self.bosh_user, self.bosh_pass)
-        self.get_deployments()
-        self.pending_tasks = list()
 
     def oauth_token_expires(self):
         '''oauth_token_expires() - return number of seconds until current key expires'''

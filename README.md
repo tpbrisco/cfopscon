@@ -78,7 +78,7 @@ Options are specified below, with any default value indicated first.
 cfopscon uses the nose2 for unittest running.  From the top-level
 directory
 ```bash
-% nose2 -v tests
+% nose2 --with-coverage --coverage=opcon -v tests
 ```
 should yield predictable results.
 

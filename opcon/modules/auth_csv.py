@@ -31,7 +31,8 @@ class UserAuth(object):
         return
 
     def user_auth(self, username, password):
-        print("user_auth(user={}, pass)".format(username))
+        if self.uc_debug:
+            print("user_auth(user={}, pass)".format(username))
         username = str(username)
         if username not in self.uc_hash:
             print("no user {} found".format(username))
@@ -47,9 +48,11 @@ class UserAuth(object):
 
     def user_loader(self, username):
         # username = username.decode('utf-8')
-        print("user_loader(user={})".format(username))
+        if self.uc_debug:
+            print("user_loader(user={})".format(username))
         if username not in self.uc_hash:
-            print("user_loader() returns None")
+            if self.uc_debug:
+                print("user_loader() returns None")
             return None
         if self.uc_hash[username]['time'] >= time.time():
             return username

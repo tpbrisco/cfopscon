@@ -127,7 +127,7 @@ class Director(object):
                 print("deployments", self.deployments)
         else:
             print("error getting deployments: ", d_r.content)
-            sys.exit(1)
+            self.deployments = list()
 
     def get_deployment_jobs(self, deployment):
         '''return a list of jobs associated with this deployment'''

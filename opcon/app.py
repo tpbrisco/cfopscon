@@ -374,7 +374,9 @@ director = director.Director(config.get('o_director_url'),
                              config.get('o_bosh_pass'),
                              debug=config.get('o_debug'),
                              verify_tls=config.get('o_verify_tls'))
-director.connect()
+if not director.connect():
+    print("Cannot connect to director {}; exiting".format(config.get('o_director_url')))
+    sys.exit(1)
 director.login()
 director.get_deployments()
 print("scheduled oauth update in %d seconds" % (

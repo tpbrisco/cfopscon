@@ -49,11 +49,12 @@ class Director(object):
                               verify=self.verify_tls)
         if not init_r.ok:
             print("error initializing", self.bosh_url)
-            sys.exit(1)
+            return False
         init_json = init_r.json()
         # cache key URLs
         self.uaa_url = init_json['user_authentication']['options']['url']
         # set up internal cached data structures
+        return True
 
     def login(self):
         self.init_auth(self.uaa_url, self.bosh_user, self.bosh_pass)
@@ -270,7 +271,7 @@ class Director(object):
             print("vitals task:", vitals_task_url)
         return vitals_task_url
 
-    def get_deployment_task_output(self, task_url):
+    def get_deployment_vitals_task_output(self, task_url):
         # this is unnecessarily tricky -
         # the output from the task is a series of json-as-text strings (one
         # object per line),  so read that, convert it into dictionary, and
@@ -313,5 +314,5 @@ class Director(object):
         if self.debug:
             print("vitals state: job is \"{}\"".format(task_w_r.json()['state']))
         # get output from task -- this is tricky
-        ary_vms = self.get_deployment_task_output(vitals_task_url)
+        ary_vms = self.get_deployment_vitals_task_output(vitals_task_url)
         return ary_vms

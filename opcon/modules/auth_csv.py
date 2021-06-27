@@ -2,6 +2,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import sys
 import time
 
+
 # UserAuth must be defined for loadable modules to work
 # Methods:
 # - init("option,option,option") - comma-delimited string for parameters
@@ -45,7 +46,7 @@ class UserAuth(object):
         return False
 
     def user_loader(self, username):
-        username = username.decode('utf-8')
+        # username = username.decode('utf-8')
         print("user_loader(user={})".format(username))
         if username not in self.uc_hash:
             print("user_loader() returns None")

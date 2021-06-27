@@ -227,7 +227,7 @@ class Director(object):
     def run_deployment_errand(self, deployment, errand_name):
         '''run indicated errand for this deployment'''
         if deployment not in self.deployments:
-            return None
+            return False
         errand_url = '{}/deployments/{}/errands/{}/runs'.format(
             self.bosh_url,
             deployment,

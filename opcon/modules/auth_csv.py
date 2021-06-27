@@ -24,7 +24,7 @@ class UserAuth(object):
                     continue
                 if user in self.uc_hash:
                     print("User ({}) already exists".format(user))
-                    sys.exit(1)
+                    continue
                 self.uc_hash[user] = {"time": 0, "hash": phash}
                 if self.uc_debug:
                     print("adding {}/{}".format(user, phash))

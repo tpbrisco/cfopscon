@@ -24,7 +24,7 @@ class UserAuth(object):
         self.client = WebApplicationClient(self.client_id)
         r = requests.get(self.discovery)
         if not r.ok:
-            print("Error discovering Google endpoints: {}".format(r.text), file=sys.stderr)
+            print("Error discovering {} endpoints: {}".format(self.auth_brand, r.text), file=sys.stderr)
             sys.exit(1)
         self.oidc_config = r.json()
         self.request_uri = self.client.prepare_request_uri(

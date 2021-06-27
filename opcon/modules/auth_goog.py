@@ -43,7 +43,7 @@ class UserAuth(object):
         return True
 
     def user_loader(self, username):
-        username = username.decode('utf-8')
+        # username = username.decode('utf-8')
         if self.debug:
             print("trying user_loader({}) in user hash: {}".format(
                 username, username in self.ug_hash))

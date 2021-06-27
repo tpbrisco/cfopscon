@@ -179,20 +179,7 @@ class Director(object):
 
     def get_logs_job(self, link):
         '''get download URL for a bosh logs command'''
-        logs_t_r = self.session.get(self.bosh_url + link,
-                                    verify=self.verify_tls)
-        task_state = logs_t_r.json()['state']
-        while task_state != 'done':
-            if self.debug:
-                print("download logs: sleep until job ready")
-            time.sleep(1)
-            logs_t_r = self.session.get(self.bosh_url + link,
-                                        verify=self.verify_tls)
-            task_state = logs_t_r.json()['state']
-        # check on job succeed/fail
-        # task_result_r = self.session.get(self.bosh_url + link + '/output',
-        #                                  params={'type': 'query'},
-        #                                  verify=self.verify_tls)
+        logs_t_r = self.task_wait_ready(link)
         # get blobstore ID from 'result' field
         download_url = "/resources/{}".format(logs_t_r.json()['result'])
         if self.debug:
@@ -264,8 +251,7 @@ class Director(object):
         #                                     errand_results_url))
         return True
 
-    def get_deployment_vitals(self, deployment):
-        '''get bosh vms --vitals'''
+    def get_deployment_vitals_submit_task(self, deployment):
         if deployment not in self.deployments:
             return None
         # deployments/<deployment>/instances?format=full
@@ -282,36 +268,50 @@ class Director(object):
         vitals_task_url = urlparse(vitals_resp.headers['Location']).path
         if self.debug:
             print("vitals task:", vitals_task_url)
-        vitals_t_r = self.session.get(self.bosh_url + vitals_task_url,
-                                      verify=self.verify_tls)
-        task_state = vitals_t_r.json()['state']
-        while task_state != 'done':
-            # should "flash" a message here
-            if self.debug:
-                print("vitals state: sleep until job ready")
-            time.sleep(1)
-            vitals_t_r = self.session.get(self.bosh_url + vitals_task_url,
-                                          verify=self.verify_tls)
-            task_state = vitals_t_r.json()['state']
-        if self.debug:
-            print("vitals state: job is ready")
-        # get output from task -- this is tricky
+        return vitals_task_url
+
+    def get_deployment_task_output(self, task_url):
+        # this is unnecessarily tricky -
         # the output from the task is a series of json-as-text strings (one
         # object per line),  so read that, convert it into dictionary, and
         # append that to a list we can then take that list-of-dicts and return
         # it as a reasonable answer.
         # All this instead of a response.json() call - because it's not json...
         if self.debug:
-            print("vitals output", self.bosh_url + vitals_task_url + '/output')
-        vitals_t_r = self.session.get(self.bosh_url + vitals_task_url + '/output',
-                                      params={'type': 'result'},
-                                      verify=self.verify_tls)
-        my_data = vitals_t_r.content.decode('ascii')  # convert \n to newline
+            print("vitals output", self.bosh_url + task_url + '/output')
+        task_r = self.session.get(self.bosh_url + task_url + '/output',
+                                  params={'type': 'result'},
+                                  verify=self.verify_tls)
+        my_data = task_r.content.decode('ascii')  # convert \n to newline
         ary_vms = list()
         for i in my_data.splitlines():
             ary_vms.append(json.loads(i))
-        if self.debug:
-            print("received data dumped to /tmp/response.json")
+            if self.debug:
+                print("received data dumped to /tmp/response.json")
             with open('/tmp/response.json', 'w') as f:
                 f.write(json.dumps(ary_vms))
+        return ary_vms
+
+    def task_wait_ready(self, task_url):
+        task_r = self.session.get(self.bosh_url + task_url,
+                                  verify=self.verify_tls)
+        task_state = task_r.json()['state']
+        while task_state != 'done':
+            # should "flash" a message here
+            if self.debug:
+                print("task state: sleep until job ready")
+            time.sleep(1)
+            task_r = self.session.get(self.bosh_url + task_url,
+                                      verify=self.verify_tls)
+            task_state = task_r.json()['state']
+        return task_r
+
+    def get_deployment_vitals(self, deployment):
+        '''get bosh vms --vitals'''
+        vitals_task_url = self.get_deployment_vitals_submit_task(deployment)
+        task_w_r = self.task_wait_ready(vitals_task_url)
+        if self.debug:
+            print("vitals state: job is \"{}\"".format(task_w_r.json()['state']))
+        # get output from task -- this is tricky
+        ary_vms = self.get_deployment_task_output(vitals_task_url)
         return ary_vms

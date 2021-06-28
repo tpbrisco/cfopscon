@@ -5,3 +5,4 @@ opcon.ini
 users.csv
 __pycache__
 .coverage
+htmlcov

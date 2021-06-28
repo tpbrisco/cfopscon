@@ -24,14 +24,6 @@ import time
 import json
 import functools
 
-# see "is_gunicorn" comments below for confusion with gunicorn
-# gunicorn gets very confused with command-line parsing options, even if
-# unused. it appears the optparse library is stepped all over between the
-# application and gunicorn libraries.
-# "is_gunicorn" is used to disable the main application parsing (or even
-# loading the optparse library)
-is_gunicorn = "gunicorn" in os.getenv('SERVER_SOFTWARE', '')
-
 # set up primary objects
 app = Flask(__name__)
 Bootstrap(app)
@@ -42,8 +34,7 @@ scheduler.init_app(app)
 scheduler.start()
 
 # main configuration dictionary
-config = config.config(command_line=not is_gunicorn,
-                       config_file=os.getenv('CONFIG_FILE', 'opcon.ini'))
+config = config.config(config_file=os.getenv('CONFIG_FILE', 'opcon.ini'))
 if config.get('o_debug'):
     app.config['DEBUG'] = config.get('o_debug')
 if config.get('o_auth_type'):

@@ -5,7 +5,7 @@ import os
 
 class config(object):
     def __init__(self, **kwargs):
-        '''config(command_line=True|False, config_file="path") - parse options'''
+        '''config(config_file="path") - parse options'''
         self.config = dict()
         if 'config_file' in kwargs:
             configini = configparser.ConfigParser()
@@ -31,34 +31,6 @@ class config(object):
                 self.config['o_auth_data'] = a.get('data')
                 self.config['o_auth_mod'] = a.get('module')
                 self.config['o_auth_debug'] = a.getboolean('debug', fallback=False)
-        # command line parsing is second, to override config file
-        if 'command_line' in kwargs and kwargs['command_line'] is True:
-            from optparse import OptionParser
-            parser = OptionParser()
-            parser.add_option('-d', '--debug', dest='debug',
-                              default=self.config['o_debug'],
-                              action='store_true',
-                              help='enable debugging mode')
-            parser.add_option('-b', '--bosh-url', dest='bosh_url', default='',
-                              help='indicate https://<ip>:<port> for bosh director')
-            parser.add_option('--skip-tls-verification', dest='verify_tls',
-                              default=self.config['o_verify_tls'],
-                              action='store_false',
-                              help='skip TLS/SSL certificate validation')
-            parser.add_option('-u', '--user', dest='bosh_user', default='',
-                              help='bosh username')
-            parser.add_option('-p', '--pass', '--password', dest='bosh_pass',
-                              default='', help='bosh password')
-            (options, args) = parser.parse_args()
-            self.config['o_debug'] = options.debug
-            self.config['o_verify_tls'] = options.verify_tls
-            if options.bosh_url:
-                self.config['o_director_url'] = options.bosh_url
-            if options.bosh_user:
-                self.config['o_bosh_user'] = options.bosh_user
-            if options.bosh_pass:
-                self.config['o_bosh_pass'] = options.bosh_pass
-        # parsing done
         if 'o_debug' in self.config and self.config['o_debug']:
             print("Configuration")
             for k in self.config:

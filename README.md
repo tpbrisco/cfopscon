@@ -79,6 +79,7 @@ cfopscon uses the nose2 for unittest running.  From the top-level
 directory
 ```bash
 % nose2 --with-coverage --coverage=opcon -v tests
+% coverage html
 ```
 should yield predictable results.
 

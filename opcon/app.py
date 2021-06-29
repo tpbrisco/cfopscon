@@ -55,8 +55,12 @@ def log_access(fn):
             query = ''
             if len(request.query_string):
                 query = '?{}'.format(request.query_string)
+            if 'X-Forwarded-For' in request.headers:
+                origin = request.headers.get('X-Forwarded-For').split(',')[0]
+            else:
+                origin = request.remote_addr
             print('access {} {} {} \"{} {}{}\"'.format(
-                request.remote_addr,
+                origin,
                 time.strftime('[%Y/%m/%d %H:%M:%ST%z]', time.localtime()),
                 user_auth.current_user(),
                 request.method,

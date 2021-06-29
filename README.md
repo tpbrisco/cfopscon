@@ -45,7 +45,7 @@ Or, for more production use-cases
 
 Or, for cloud foundry foundations
 ```bash
-% cf push -f manifestlyml
+% cf push -f manifest.yml
 ```
 
 ## Options

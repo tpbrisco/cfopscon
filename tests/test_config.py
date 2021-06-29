@@ -5,10 +5,10 @@ from opcon.modules import config
 class TestConfig(unittest.TestCase):
     def setUp(self):
         self.config = config.config(command_line=False,
-                                    config_file="tests/test_config.ini")
+                                    config_file="tests/data/test_config.ini")
 
     def test_config_b_debug(self):
-        self.assertEqual(self.config['o_debug'], False)
+        self.assertEqual(self.config['o_debug'], True)
 
     def test_config_b_director(self):
         self.assertEqual(self.config['o_director_url'],
@@ -30,10 +30,24 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(self.config['o_auth_data'], 'a,b,c')
 
     def test_config_a_mod(self):
-        self.assertEqual(self.config['o_auth_mod'], 'auth_null.py')
+        self.assertEqual(self.config['o_auth_mod'], 'auth_null')
 
     def test_config_a_debug(self):
         self.assertEqual(self.config['o_auth_debug'], True)
+
+    def test_config_getter(self):
+        result = self.config.get('o_auth_debug')
+        self.assertEqual(True, result)
+
+    def test_config_repr(self):
+        cfgrepr = self.config.__repr__()
+        self.assertNotEqual(len(cfgrepr), 0)
+
+    def test_config_absence(self):
+        nonevar = self.config.get('notthere')
+        self.assertEqual(nonevar, None)
+        nonevar = self.config['nothere']
+        self.assertEqual(nonevar, None)
 
 
 if __name__ == '__main__':

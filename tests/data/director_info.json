@@ -1,0 +1,49 @@
+{
+  "name": "bosh-lite",
+  "uuid": "8eff65f6-1881-4ca4-af09-c74fec6c97c2",
+  "version": "271.8.0 (00000000)",
+  "user": null,
+  "cpi": "warden_cpi",
+  "stemcell_os": "ubuntu-bionic",
+  "stemcell_version": "1.1",
+  "user_authentication": {
+    "type": "uaa",
+    "options": {
+      "url": "https://192.168.50.6:8443",
+      "urls": [
+        "https://192.168.50.6:8443"
+      ]
+    }
+  },
+  "features": {
+    "local_dns": {
+      "status": true,
+      "extras": {
+        "domain_name": "bosh"
+      }
+    },
+    "power_dns": {
+      "status": false,
+      "extras": {
+        "domain_name": "bosh"
+      }
+    },
+    "compiled_package_cache": {
+      "status": false,
+      "extras": {
+        "provider": null
+      }
+    },
+    "snapshots": {
+      "status": false
+    },
+    "config_server": {
+      "status": true,
+      "extras": {
+        "urls": [
+          "https://192.168.50.6:8844/api/"
+        ]
+      }
+    }
+  }
+}

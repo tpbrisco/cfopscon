@@ -8,4 +8,5 @@ WTForms
 requests
 gunicorn
 oauthlib
-jwt
+PyJWT
+cryptography

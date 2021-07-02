@@ -98,12 +98,7 @@ def login_callback():
         print("got callback with no code")
         return Response('code is missing', 401)
     # have auth code, next link - get token, and redirect there
-    token_endpoint = user_auth.ua_lib.oidc_config['token_endpoint']
-    token_url, headers, body = user_auth.ua_lib.client.prepare_token_request(
-        token_endpoint,
-        authorization_response=request.url,
-        redirect_url=request.base_url,
-        code=code)
+    token_url, headers, body = user_auth.ua_lib.prepare_token_request(code)
     token_r = requests.post(
         token_url,
         headers=headers,
@@ -144,7 +139,7 @@ def login():
             if ua_debug:
                 print("POST oidc render brand={} request_uri={}".format(
                     user_auth.ua_lib.auth_brand,
-                    user_auth.ua_lib.request_uri))
+                    user_auth.ua_lib.code_request_uri))
             render_template("login_oidc.html",
                             ua_brand=user_auth.ua_lib.auth_brand,
                             ua_action=user_auth.ua_lib.request_uri)
@@ -155,12 +150,12 @@ def login():
             return render_template('login_csv.html')
         elif ua_type == 'oidc':
             if ua_debug:
-                print("GET oidc render brand={} request_uri={}".format(
+                print("GET oidc render brand={} code_request_uri={}".format(
                     user_auth.ua_lib.auth_brand,
-                    user_auth.ua_lib.request_uri))
+                    user_auth.ua_lib.code_request_uri))
             return render_template('login_oidc.html',
                                    ua_brand=user_auth.ua_lib.auth_brand,
-                                   ua_action=user_auth.ua_lib.request_uri)
+                                   ua_action=user_auth.ua_lib.code_request_uri)
         else:
             return render_template('login_csv.html')
 

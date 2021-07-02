@@ -20,7 +20,7 @@ class TestConfig(unittest.TestCase):
         app.config['USER_AUTH_TYPE'] = 'MOD'
         app.config['USER_AUTH_DEBUG'] = True
         app.config['USER_AUTH_MOD'] = 'auth_goog'
-        app.config['USER_AUTH_DATA'] = 'client_id,client_secret,https://base_url'
+        app.config['USER_AUTH_DATA'] = 'client_id,client_secret,https://accounts.google.com,https://base_url'
         self.user_auth = auth.user_authentication(app)
         # overwrite flask_login hooks
         self.user_auth.flask_login_required = void_func

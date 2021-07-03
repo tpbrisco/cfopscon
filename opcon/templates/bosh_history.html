@@ -20,6 +20,7 @@
         <th colspan="4">Data</th></tr></thead>
     <tbody>
       {% for task in tasks %}
+      {% if not task.description.startswith('snapshot') %}
       <tr><td>{{ task.id }}</td><td>{{ task.state }}</td><td>{{ task.description }}</td>
 	<td>{{ task.timestamp |datetime}}</td>
 	<td>{{ task.result }}</td><td>{{ task.user }}</td>
@@ -29,6 +30,7 @@
 	<td><a href="/bosh/tasks/{{ task.id }}/output?type=event" target="_blank">Event</a></td>
 	<td><a href="javascript:cancelTask({{ task.id }}, '{{ task.state }}')">Cancel</a></td>
       </tr>
+      {% endif %}
       {% endfor %}
     </tbody>
   </table>

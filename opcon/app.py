@@ -1,16 +1,15 @@
 
 from opcon.modules import director
-from opcon.modules import boshforms
 from opcon.modules import auth
 from opcon.modules import config
+from opcon.modules import accesslog
+from opcon.bosh.bosh_bp import bosh_bp
 from flask import (
     Flask,
     render_template,
     request,
     Response,
     redirect,
-    stream_with_context,
-    has_request_context,
     flash,
     url_for
 )
@@ -21,8 +20,6 @@ import uuid
 import os
 import sys
 import time
-import json
-import functools
 
 # set up primary objects
 app = Flask(__name__)
@@ -47,33 +44,24 @@ user_auth = auth.user_authentication(app)
 user_auth.ua_login_manager.init_app(app)
 user_auth.ua_login_manager.login_view = 'login'
 
+director = director.Director(config.get('o_director_url'),
+                             config.get('o_bosh_user'),
+                             config.get('o_bosh_pass'),
+                             debug=config.get('o_debug'),
+                             verify_tls=config.get('o_verify_tls'))
+app.config.update({'AUTH': user_auth, 'DIRECTOR': director})
 
-def log_access(fn):
-    @functools.wraps(fn)
-    def log_url_access(*args, **kwargs):
-        if has_request_context():
-            query = ''
-            if len(request.query_string):
-                query = '?{}'.format(request.query_string)
-            if 'X-Forwarded-For' in request.headers:
-                origin = request.headers.get('X-Forwarded-For').split(',')[0]
-            else:
-                origin = request.remote_addr
-            print('access {} {} {} \"{} {}{}\"'.format(
-                origin,
-                time.strftime('[%Y/%m/%d %H:%M:%ST%z]', time.localtime()),
-                user_auth.current_user(),
-                request.method,
-                request.path,
-                query))
-        return fn(*args, **kwargs)
-    return log_url_access
+
+# add jinja template for converting "Epoch" dates to time strings
+@app.template_filter('datetime')
+def format_datetime(value):
+    return time.ctime(value)
 
 
 @app.route("/index.html")
 @app.route("/")
 @user_auth.flask_login_required
-@log_access
+@accesslog.log_access
 def index():
     return render_template("index.html", director=director,
                            stats=director.get_director_stats())
@@ -170,200 +158,15 @@ def login_redirect():
 
 
 @app.route('/logout')
-@log_access
+@accesslog.log_access
 def logout():
     user_auth.logout_user()
     return redirect(url_for('index'))
 
 
-@app.route("/bosh", methods=['GET', 'POST'])
-@user_auth.flask_login_required
-@log_access
-def bosh_logs():
-    if len(director.deployments) == 0:
-        return render_template('index.html', director=director)
-    if request.method == 'POST':
-        form = boshforms.BoshLogsForm(request.form)
-        if form.validate_on_submit():
-            director.submit_logs_job(form.deployment.data, form.jobs.data)
-        else:
-            sys.stderr.write("form.errors:{}\n".format(form.errors))
-        return render_template('bosh.html',
-                               form=boshforms.BoshLogsForm(),
-                               deployments=director.deployments,
-                               jobs=director.get_deployment_jobs(director.deployments[0]),
-                               tasks=director.pending_tasks)
-    elif request.method == 'GET':
-        return render_template('bosh.html',
-                               form=boshforms.BoshLogsForm(),
-                               deployments=director.deployments,
-                               jobs=director.get_deployment_jobs(director.deployments[0]),
-                               tasks=director.pending_tasks)
-    return render_template('index.html', director=director)
+app.register_blueprint(bosh_bp, url_prefix='/bosh')
 
 
-# add jinja template for converting "Epoch" dates to time strings
-@app.template_filter('datetime')
-def format_datetime(value):
-    return time.ctime(value)
-
-
-@app.route("/bosh/tasks", methods=['GET'])
-@user_auth.flask_login_required
-@log_access
-def get_tasks():
-    limit = request.args.get('limit', default=0, type=int)
-    # return Response(director.get_job_history(limit),
-    #                 content_type='application/json')
-    return render_template('bosh_history.html',
-                           tasks=director.get_job_history(limit))
-
-
-@app.route("/bosh/tasks/<taskid>", methods=['GET'])
-@user_auth.flask_login_required
-@log_access
-def download_logs(taskid):
-    t = None
-    for t in director.pending_tasks:
-        if "/tasks/{}".format(taskid) == t.t_url:
-            break
-    if t is None:
-        return Response('Could not find task', 404)
-    filename = t.t_query.replace('/', '_').replace(' ', '_') + ".tgz"
-    # director.pending_tasks.remove(t)
-    download_url = director.get_logs_job("/tasks/{}".format(taskid))
-    r = director.session.get(director.bosh_url + download_url,
-                             verify=director.verify_tls,
-                             stream=True)
-    return Response(stream_with_context(r.iter_content(chunk_size=512 * 1024)),
-                    content_type='application/gzip',
-                    headers={'Content-Disposition': "attachment; filename={}".format(filename)})
-
-
-@app.route("/bosh/tasks/<taskid>/output", methods=['GET'])
-@user_auth.flask_login_required
-@log_access
-def get_task_output(taskid):
-    output_type = request.args.get('type')
-    if output_type == '':
-        output_type = 'result'
-    task_url = '/tasks/{}/output'.format(taskid)
-    r = director.session.get(director.bosh_url + task_url,
-                             params={'type': output_type},
-                             verify=director.verify_tls)
-    if r.ok:
-        return Response(r.text, content_type='text/plain')
-    else:
-        return Response("error fetching task {} output".format(
-            taskid) + r.text, content_type='text/plain')
-
-
-@app.route("/bosh/tasks/<taskid>/cancel", methods=['GET'])
-@user_auth.flask_login_required
-@log_access
-def cancel_task(taskid):
-    task_url = '/task/{}'.format(taskid)
-    r = director.session.delete(director.bosh_url + task_url)
-    if r.ok:
-        return Response("{}", status=r.status)
-    else:
-        return Response(r.text, status=r.status)
-
-
-@app.route("/bosh/deployment/errands", methods=['GET'])
-@user_auth.flask_login_required
-@log_access
-def get_deployment_errands():
-    deployment = request.args.get('deployment')
-    if len(director.deployments) == 0:
-        return render_template('index.html', director=director)
-    if deployment is None:
-        deployment = director.deployments[0]
-    errands = director.get_deployment_errands(deployment)
-    return render_template('bosh_errands.html',
-                           deployment_name=deployment,
-                           deployments=director.deployments,
-                           deployment_errands=errands)
-
-
-@app.route("/bosh/deployment/<deployment>/errand/<errand>/run")
-@user_auth.flask_login_required
-@log_access
-def run_deployment_errand(deployment, errand):
-    running = director.run_deployment_errand(deployment, errand)
-    if running:
-        rcode = 200
-    else:
-        rcode = 400
-    return Response("{'running': '%s'}" % (running), status=rcode)
-
-
-@app.route("/bosh/deployment/vitals", methods=['GET'])
-@user_auth.flask_login_required
-@log_access
-def get_deployment_vitals_default():
-    deployment = request.args.get('deployment')
-    if len(director.deployments) == 0:
-        return render_template('index.html', director=director)
-    if deployment is None:
-        deployment = director.deployments[0]
-    vitals = director.get_deployment_vitals(deployment)
-    return render_template('bosh_vitals.html',
-                           deployment_name=deployment,
-                           deployments=director.deployments,
-                           deployment_vitals=vitals)
-
-
-@app.route("/bosh/deployment/<deployment>/jobs", methods=['GET'])
-@user_auth.flask_login_required
-@log_access
-def get_deployment_jobs(deployment):
-    return Response(json.dumps(director.get_deployment_jobs(deployment)),
-                    content_type='application/json')
-
-
-@app.route('/vm_control', methods=['GET'])
-@user_auth.flask_login_required
-@log_access
-def vm_control():   # (deployment, vmi, action):
-    deployment = request.args.get('deployment')
-    vmi = request.args.get('vmi')
-    action = request.args.get('action')
-    skip_drain = request.args.get('skip_drain')
-    inst_group, inst = vmi.split('/')
-    if deployment is None or vmi is None or inst_group is None or inst is None:
-        return Response("{'error': 'deployment, vm required (vm as vm/guid or vm/index)'}",
-                        status=400,
-                        content_type='application/json')
-    if action not in ['restart', 'recreate', 'stop', 'start']:
-        return Response("{'error': 'action is required: restart,recreate,stop,start'}",
-                        status=400,
-                        content_type='application/json')
-    if skip_drain is None:
-        skip_drain = False
-    action_url = '{}/deployments/{}/instance_groups/{}/{}/actions/{}'.format(
-        director.bosh_url, deployment, inst_group, inst, action)
-    a_r = director.session.post(action_url,
-                                params={'skip_drain': skip_drain},
-                                verify=director.verify_tls)
-    if director.debug:
-        print("URL {} returns {}".format(action_url, a_r.text))
-    if a_r.ok:
-        return Response(status=a_r.status_code,
-                        content_type='application/json',
-                        response=a_r.json())
-    else:
-        error_msg = {'error': a_r.text}
-        return Response(error_msg,
-                        status=a_r.status_code,
-                        content_type='application/json')
-
-
-director = director.Director(config.get('o_director_url'),
-                             config.get('o_bosh_user'),
-                             config.get('o_bosh_pass'),
-                             debug=config.get('o_debug'),
-                             verify_tls=config.get('o_verify_tls'))
 if not director.connect():
     print("Cannot connect to director {}; exiting".format(config.get('o_director_url')))
     sys.exit(1)

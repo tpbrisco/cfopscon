@@ -12,10 +12,10 @@
     <li class="dropdown">
       <a class="dropdown-toggle" data-toggle="dropdown" href="#">BOSH Actions</a>
       <ul class="dropdown-menu">
-	<li><a href="{{ url_for('bosh_logs') }}">Logs</a></li>
-	<li><a href="{{ url_for('get_tasks') }}">Tasks</a></li>
-	<li><a href="{{ url_for('get_deployment_vitals_default') }}">Vitals</a></li>
-	<li><a href="{{ url_for('get_deployment_errands') }}">Errands</a></li>
+	<li><a href="{{ url_for('bosh_bp.bosh_logs') }}">Logs</a></li>
+	<li><a href="{{ url_for('bosh_bp.get_tasks') }}">Tasks</a></li>
+	<li><a href="{{ url_for('bosh_bp.get_deployment_vitals_default') }}">Vitals</a></li>
+	<li><a href="{{ url_for('bosh_bp.get_deployment_errands') }}">Errands</a></li>
       </ul>
     </li>
     <li class="nav nav-pills">

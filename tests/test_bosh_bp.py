@@ -74,4 +74,30 @@ class TestConfig(flask_unittest.AppTestCase):
     def test_bosh_bp_download_logs(self, app):
         with app.test_client() as client:
             rv = client.get('/bosh/tasks/42')
-            print("RV code {} is and {}".format(rv.status_code, rv))
+            print("RV code {} and {}".format(rv.status_code, rv))
+            # redirect to blobstore URL
+            self.assertEqual(rv.status_code, 302)
+
+    def test_bosh_bp_get_task_output(self, app):
+        with app.test_client() as client:
+            rv = client.get('/bosh/tasks/42/output')
+            print("RV code {} and {}".format(rv.status_code, rv))
+            self.assertEqual(rv.status_code, 302)
+
+    def test_bosh_bp_cancel_task(self, app):
+        with app.test_client() as client:
+            rv = client.get('/bosh/tasks/42/cancel')
+            print("RV code {} and {}".format(rv.status_code, rv))
+            self.assertEqual(rv.status_code, 302)
+
+    def test_bosh_bp_get_deployment_errands(self, app):
+        with app.test_client() as client:
+            rv = client.get('/bosh/deployment/errands')
+            print("RV code {} and {}".format(rv.status_code, rv))
+            self.assertEqual(rv.status_code, 302)
+
+    def test_bosh_bp_run_deployment_errands(self, app):
+        with app.test_client() as client:
+            rv = client.get('/bosh/deployment/cf/errand/smoke_test/run')
+            print("RV code {} and {}".format(rv.status_code, rv))
+            self.assertEqual(rv.status_code, 302)

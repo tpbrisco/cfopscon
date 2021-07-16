@@ -16,6 +16,7 @@ class config(object):
                 self.config['o_director_url'] = g.get('director_url')
                 self.config['o_verify_tls'] = g.getboolean('verify_tls',
                                                            fallback=True)
+                self.config['o_testing'] = g.getboolean('testing', fallback=False)
                 self.config['o_bosh_user'] = g.get('user',
                                                    fallback=os.getenv('BOSH_USERNAME', ''))
                 self.config['o_bosh_pass'] = g.get('pass',

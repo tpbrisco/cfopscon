@@ -31,7 +31,10 @@ class Director(object):
     '''Director(bosh url, bosh username, bosh password) - generate an object to talk to BOSH'''
     def __init__(self, url, user, password, **kwargs):
         self.debug = False
+        self.testing = False
         self.verify_tls = True
+        if 'testing' in kwargs:
+            self.testing = kwargs['testing']
         if 'debug' in kwargs:
             self.debug = kwargs['debug']
         if 'verify_tls' in kwargs:
@@ -41,6 +44,7 @@ class Director(object):
         self.bosh_url = url
         self.bosh_user = user
         self.bosh_pass = password
+        self.uaa_url = ''
         self.pending_tasks = list()
 
     def connect(self):
@@ -48,7 +52,7 @@ class Director(object):
         try:
             init_r = requests.get(self.bosh_url + "/info",
                                   verify=self.verify_tls)
-        except (requests.exceptions.IOError,
+        except (requests.exceptions.ConnectionError,
                 requests.exceptions.HTTPError,
                 requests.exceptions.SSLError,
                 requests.exceptions.Timeout) as e:
@@ -56,6 +60,7 @@ class Director(object):
             return False
         if not init_r.ok:
             print("error initializing", self.bosh_url)
+            self.uaa_url = 'http://127.0.0.1'
             return False
         init_json = init_r.json()
         # cache key URLs
@@ -68,6 +73,8 @@ class Director(object):
 
     def oauth_token_expires(self):
         '''oauth_token_expires() - return number of seconds until current key expires'''
+        if self.testing:
+            return 86400
         return int(self.oauth['expires_in'])
 
     def __p_hash(self, key):
@@ -124,6 +131,8 @@ class Director(object):
 
     def get_deployments(self):
         '''get a list of deployments on this director'''
+        if self.testing:
+            return ['cf', 'zookeeper']
         d_r = self.session.get(self.bosh_url + "/deployments",
                                verify=self.verify_tls)
         if d_r.ok:

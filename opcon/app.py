@@ -49,6 +49,7 @@ director = director.Director(config.get('o_director_url'),
                              config.get('o_bosh_user'),
                              config.get('o_bosh_pass'),
                              debug=config.get('o_debug'),
+                             testing=config.get('o_testing'),
                              verify_tls=config.get('o_verify_tls'))
 app.config.update({'AUTH': user_auth, 'DIRECTOR': director})
 app.config.update({
@@ -73,7 +74,7 @@ def index():
                            stats=director.get_director_stats())
 
 
-@app.route('/deployment')
+@app.route('/deployment', methods=['GET'])
 def deployment_info():
     dpl_d = {'git_hash': app.config['DEPLOYMENT_GITHASH'],
              'deployment_date': app.config['DEPLOYMENT_DATE'],
@@ -182,11 +183,12 @@ def logout():
 app.register_blueprint(bosh_bp, url_prefix='/bosh')
 
 
-if not director.connect():
+if not director.connect() and not config.get('o_testing'):
     print("Cannot connect to director {}; exiting".format(config.get('o_director_url')))
     sys.exit(1)
-director.login()
-director.get_deployments()
+if not config.get('o_testing'):
+    director.login()
+    director.get_deployments()
 print("scheduled oauth update in %d seconds" % (
     director.oauth_token_expires() - 30))
 scheduler.add_job(id='oauth-refresh',

@@ -21,3 +21,10 @@ class UserAuth(object):
         if self.un_hash[username] >= int(time.time()):
             return username
         return None
+
+    def prepare_token_request(self, code):
+        if code == '0000':
+            return '/mock', {}, {}
+
+    def get_user_from_token(self, id_d):
+        return 'nobody'

@@ -12,7 +12,7 @@ class TestConfig(unittest.TestCase):
 
     def test_config_b_director(self):
         self.assertEqual(self.config['o_director_url'],
-                         'https://10.0.0.0:25555')
+                         'https://127.0.0.1:25555')
 
     def test_config_b_tls(self):
         self.assertEqual(self.config['o_verify_tls'], False)

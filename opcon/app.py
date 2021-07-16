@@ -20,6 +20,7 @@ import uuid
 import os
 import sys
 import time
+import json
 
 # set up primary objects
 app = Flask(__name__)
@@ -50,7 +51,11 @@ director = director.Director(config.get('o_director_url'),
                              debug=config.get('o_debug'),
                              verify_tls=config.get('o_verify_tls'))
 app.config.update({'AUTH': user_auth, 'DIRECTOR': director})
-
+app.config.update({
+    'DEPLOYMENT_GITHASH': os.getenv('DEPLOYMENT_GITHASH', 'no_hash'),
+    'DEPLOYMENT_DATE': os.getenv('DEPLOYMENT_DATE', time.asctime()),
+    'DEPLOYMENT_ACTOR': os.getenv('DEPLOYMENT_ACTOR', 'unknown')
+    })
 
 # add jinja template for converting "Epoch" dates to time strings
 @app.template_filter('datetime')
@@ -65,6 +70,15 @@ def format_datetime(value):
 def index():
     return render_template("index.html", director=director,
                            stats=director.get_director_stats())
+
+
+@app.route('/deployment')
+def deployment_info():
+    dpl_d = {'git_hash': app.config['DEPLOYMENT_GITHASH'],
+             'deployment_date': app.config['DEPLOYMENT_DATE'],
+             'deployment_actor': app.config['DEPLOYMENT_ACTOR']}
+    return Response(json.dumps(dpl_d, indent=2),
+                    status=200, content_type='application/json')
 
 
 @user_auth.ua_login_manager.user_loader

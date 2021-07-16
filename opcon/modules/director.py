@@ -45,8 +45,15 @@ class Director(object):
 
     def connect(self):
         # get BOSH session initialization info
-        init_r = requests.get(self.bosh_url + "/info",
-                              verify=self.verify_tls)
+        try:
+            init_r = requests.get(self.bosh_url + "/info",
+                                  verify=self.verify_tls)
+        except (requests.exceptions.IOError,
+                requests.exceptions.HTTPError,
+                requests.exceptions.SSLError,
+                requests.exceptions.Timeout) as e:
+            print("Error getting bosh /info {}: {}".format(self.bosh_url + "/info", e), file=sys.stderr)
+            return False
         if not init_r.ok:
             print("error initializing", self.bosh_url)
             return False

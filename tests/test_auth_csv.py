@@ -41,7 +41,7 @@ class TestConfig(unittest.TestCase):
 
     def test_auth_csv_user_loader(self):
         user = self.user_auth.login_user('fake', 'foofoo')
-        user = self.user_auth.user_loader('fake')
-        self.assertEqual(user.username.decode('utf-8'), 'fake')
-        user = self.user_auth.user_loader('fakenotthere')
+        user = self.user_auth.user_loader(b'fake')
+        self.assertEqual(user.username, b'fake')
+        user = self.user_auth.user_loader(b'fakenotthere')
         self.assertEqual(user, None)

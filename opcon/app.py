@@ -123,7 +123,7 @@ def login_callback():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     next = request.args.get('next')
-    if not next and not next.startswith('http'):
+    if next is not None and not next.startswith('http'):
         next = url_for('index')
     ua_type = user_auth.ua_lib.auth_type
     ua_debug = app.config['USER_AUTH_DEBUG']
@@ -136,7 +136,7 @@ def login():
             user_auth.login_user(username, password)
             return redirect(next)
         elif ua_type == 'oidc':
-            request_uri = user_auth.ua_lib.client.prepare_request_uri(
+            request_uri = user_auth.ua_lib.prepare_request_uri(
                 user_auth.ua_lib.oidc_config['authorization_endpoint'],
                 redirect_url="/_callback",
                 scope=["openid", "email", "profile"])
@@ -148,7 +148,7 @@ def login():
                             ua_brand=user_auth.ua_lib.auth_brand,
                             ua_action=user_auth.ua_lib.request_uri)
         return render_template("login_csv.html")
-    else:
+    if request.method == 'GET':
         # GET assumes we want to login, redirect to form based on ua_type
         if ua_type == 'userpass':
             return render_template('login_csv.html')
@@ -162,6 +162,7 @@ def login():
                                    ua_action=user_auth.ua_lib.code_request_uri)
         else:
             return render_template('login_csv.html')
+    return render_template(url_for('index'))
 
 
 @app.route('/login_redirect', methods=['GET', 'POST'])

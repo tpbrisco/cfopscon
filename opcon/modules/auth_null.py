@@ -7,6 +7,7 @@ class UserAuth(object):
         self.auth_brand = 'Null and/or Void'
         self.un_hash = dict()
         self.un_hash['username'] = int(time.time()) + 86400
+        self.code_request_uri = 'http://127.0.0.1'
         return
 
     def user_auth(self, username, password):

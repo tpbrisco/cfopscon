@@ -14,7 +14,7 @@ these.
 
 The Operators Console leverages the APIs of BOSH and CF API to achieve
 it's goals; as such, it must contain privileged information (see opcon.ini)
-(e.g. username/password) to bootstrap OAuth2 credentials necessary to
+(i.e. username/password) to bootstrap OAuth2 credentials necessary to
 access the appropriate APIs.
 
 ## Current Status
@@ -95,12 +95,3 @@ should yield predictable results.
   job to complete for logs download - put a status update.
   Presumably jQuery, and use the /deployments/:deployment/instances API~~
 - restart CF brokers
-- ~~reauthentication timeouts need to occur for oauth/google - verify in auth/module~~
-- ~~Implement authentication for access to the system (CSV, 3rd party -  e.g google)~~
-- ~~user activity tracking - log who-did-what~~
-- ~~recreate specific VMs~~
-- ~~show VM health state (bosh vms --vitals)~~
-- ~~Implement auto-fill for BOSH deployment jobs~~
-- ~~add the ability to run existing bosh errands~~
-- ~~from bosh_tasks - remove data-results column (that's in the main table)~~
-- ~~cancel tasks~~

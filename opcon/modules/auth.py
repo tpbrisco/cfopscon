@@ -10,8 +10,9 @@ class User(object):
         self.is_authenticated = False
         self.is_active = False
         self.is_anonymous = True
-        self.username = str(name).encode('unicode-escape')
+        self.username = str(name).encode('utf-8')
         self.debug = False
+        print("User init: {}".format(name))
 
     def get_id(self):
         return self.username
@@ -62,7 +63,8 @@ class user_authentication(object):
 
     def login_user(self, username, param):
         '''initiate user login'''
-        if self.ua_lib.auth_type == 'oidc':
+        auth_type = self.ua_lib.auth_type
+        if auth_type == 'oidc':
             if self.ua_lib.user_auth(username, param):
                 ok_user = User(username)
                 ok_user.is_authenticated = True
@@ -75,7 +77,7 @@ class user_authentication(object):
                                       duration=datetime.timedelta(hours=1))
                 return ok_user
             return None
-        if self.ua_lib.auth_type == 'userpass':
+        if auth_type == 'userpass':
             if self.ua_lib.user_auth(username, param):
                 ok_user = User(username)
                 ok_user.is_authenticated = True

@@ -72,7 +72,7 @@ class user_authentication(object):
                 if self.debug:
                     print("User:{} logged in".format(ok_user))
                 self.flask_login_user(ok_user,
-                                    duration=datetime.timedelta(hours=1))
+                                      duration=datetime.timedelta(hours=1))
                 return ok_user
             return None
         if self.ua_lib.auth_type == 'userpass':

@@ -11,6 +11,7 @@ from opcon.modules import auth
 from opcon.modules import config
 from urllib.parse import quote
 
+
 def void_func(*args, **kwargs):
     pass
 
@@ -73,3 +74,10 @@ class TestConfig(flask_unittest.ClientTestCase):
                                         'next': 'http://127.0.0.1'})
         self.assertEqual(r.status_code, 302)  # redirect to index
         self.assertEqual(r.headers['Location'], 'http://localhost/None')
+
+    def test_app_login_redirect(self, client):
+        r = client.get('/login_redirect')
+        self.assertEqual(r.status_code, 200)
+        r = client.post('/login_redirect')
+        self.assertEqual(r.status_code, 200)
+

@@ -157,7 +157,6 @@ def get_deployment_jobs(deployment):
     director = current_app.config['DIRECTOR']
     return Response(json.dumps(director.get_deployment_jobs(deployment)),
                     content_type='application/json')
-    pass
 
 
 @bosh_bp.route('/vm_control', methods=['GET'])

@@ -94,9 +94,9 @@ def login_callback():
     if auth_type != 'oidc':
         print("got callback for non-oidc auth agent")
         return Response('not oidc enabled', 401)
-    next = request.args.get('next')
-    if not next:
-        next = url_for('index')
+    next_url = request.args.get('next')
+    if not next_url:
+        next_url = url_for('index')
     code = request.args.get("code")
     if not code:
         print("got callback with no code")
@@ -117,14 +117,14 @@ def login_callback():
     username = user_auth.ua_lib.get_user_from_token(token_dict['id_token'])
     user_auth.login_user(username, token_dict)
     # now that we've completed the user login, redirect back to "next"
-    return redirect(next)
+    return redirect(next_url)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    next = request.args.get('next')
-    if next is not None and not next.startswith('http'):
-        next = url_for('index')
+    next_url = request.args.get('next')
+    if next_url is not None and not next_url.startswith('http'):
+        next_url = url_for('index')
     ua_type = user_auth.ua_lib.auth_type
     ua_debug = app.config['USER_AUTH_DEBUG']
     if ua_debug:
@@ -134,7 +134,7 @@ def login():
             username = request.form['username']
             password = request.form['password']
             user_auth.login_user(username, password)
-            return redirect(next)
+            return redirect(next_url)
         elif ua_type == 'oidc':
             request_uri = user_auth.ua_lib.prepare_request_uri(
                 user_auth.ua_lib.oidc_config['authorization_endpoint'],

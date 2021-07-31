@@ -74,7 +74,7 @@ def index():
                            stats=director.get_director_stats())
 
 
-@app.route('/deployment', methods=['GET'])
+@app.route('/version', methods=['GET'])
 def deployment_info():
     dpl_d = {'git_hash': app.config['DEPLOYMENT_GITHASH'],
              'deployment_date': app.config['DEPLOYMENT_DATE'],

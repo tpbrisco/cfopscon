@@ -51,7 +51,7 @@ Or, for cloud foundry foundations
 ## Options
 Options and configuration are contained in the "opcon.ini" file (or
 file specified by the CONFIG_FILE environment variable).  It is broken
-into 2 sections - "bosh" and "auth".
+into 3 sections - "bosh", "auth" and deployment errand ACLs.
 
 Options are specified below, with any default value indicated first.
 ### bosh options
@@ -66,6 +66,15 @@ Options are specified below, with any default value indicated first.
   - module=_module.py_ - module located in modules/ area
   - data=_mod\_specific_ - module-specific comma-seperated list
   - debug=_False_ - module-specific debugging
+
+### errands\__deployment-prefix_ options
+- allow=["regexp", "regexp"]
+
+> Sections named "errands_[deployment]" contain an "allow" ACL of errands
+> that can be run for the matching deployment.  If a deployment name
+> starts with "depl-prefix", then the list of errand regular expressions
+> will be applied as an ACL indicating whcih errands can be run.  If there is
+> no errand ACL for a deployment, the default is to allow all errands.
 
 ## Limitations
 - running multiple instances of the process running doesn't work

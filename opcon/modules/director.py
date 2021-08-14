@@ -5,6 +5,7 @@ from urllib.parse import urlparse
 import time
 import hashlib
 import json
+import re
 
 TASK_LOGS = 1
 task_index = {
@@ -33,6 +34,7 @@ class Director(object):
         self.debug = False
         self.testing = False
         self.verify_tls = True
+        self.errands_acls = None
         if 'testing' in kwargs:
             self.testing = kwargs['testing']
         if 'debug' in kwargs:
@@ -41,6 +43,8 @@ class Director(object):
             self.verify_tls = kwargs['verify_tls']
             if self.verify_tls is False:
                 urllib3.disable_warnings()
+        if 'errands' in kwargs:
+            self.errands_acls = kwargs['errands']
         self.bosh_url = url
         self.bosh_user = user
         self.bosh_pass = password
@@ -218,6 +222,29 @@ class Director(object):
         else:
             return {}
 
+    def __filter_errands(self, deployment, errand_list):
+        '''filter_errands(deployment_name, dictionary of errands) - return allowed errands'''
+        def deployment_errands_acl(deployment):
+            for key in self.errands_acls.keys():
+                if deployment.startswith(key):
+                    return self.errands_acls[key]
+            return None
+        # find allow list in self
+        if self.errands_acls is None:
+            # allow all if no allow-lists are specified
+            return errand_list
+        # for this deployment, look at our allow-lists, and return the relevant one
+        errands_allowed = deployment_errands_acl(deployment)
+        if errands_allowed is None:
+            # allow all if no allow-lists specified for this deployment
+            return errand_list
+        valid_errands = list()
+        for k in errand_list:
+            for allowed_errand_re in errands_allowed['allow']:
+                if re.match(allowed_errand_re, k):
+                    valid_errands.append(k)
+        return valid_errands
+
     def get_deployment_errands(self, deployment):
         '''get bosh errands for this deployment'''
         if deployment not in self.deployments:
@@ -225,7 +252,7 @@ class Director(object):
         errands_url = '%s/deployments/%s/errands' % (
             self.bosh_url, deployment)
         if self.debug:
-            print("fetching deployment errands", errands_url)
+            print("fetching deployment errands from", errands_url)
         errands_resp = self.session.get(errands_url,
                                         verify=self.verify_tls)
         if not errands_resp.ok:
@@ -236,8 +263,14 @@ class Director(object):
             return None
         errand_dict = errands_resp.json()
         errand_ary = list()
+        # convert dictionary of names into simple list
         for e in errand_dict:
             errand_ary.append(e['name'])
+        if self.debug:
+            print("Got errands: {}".format(errand_ary))
+        errand_ary = self.__filter_errands(deployment, errand_ary)
+        if self.debug:
+            print("Allowed errands: {}".format(errand_ary))
         return errand_ary
 
     def run_deployment_errand(self, deployment, errand_name):

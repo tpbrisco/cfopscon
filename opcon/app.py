@@ -40,6 +40,10 @@ if config.get('o_auth_type'):
     app.config['USER_AUTH_DATA'] = config.get('o_auth_data')
     app.config['USER_AUTH_MOD'] = config.get('o_auth_mod')
     app.config['USER_AUTH_DEBUG'] = config.get('o_auth_debug')
+else:
+    print("No auth type configured; this isn't going to go well", file=sys.stderr)
+    sys.exit(1)
+errands_acls = config.get('errands_acls')
 
 user_auth = auth.user_authentication(app)
 user_auth.ua_login_manager.init_app(app)
@@ -50,7 +54,8 @@ director = director.Director(config.get('o_director_url'),
                              config.get('o_bosh_pass'),
                              debug=config.get('o_debug'),
                              testing=config.get('o_testing'),
-                             verify_tls=config.get('o_verify_tls'))
+                             verify_tls=config.get('o_verify_tls'),
+                             errands=errands_acls)
 app.config.update({'AUTH': user_auth, 'DIRECTOR': director})
 app.config.update({
     'DEPLOYMENT_GITHASH': os.getenv('DEPLOYMENT_GITHASH', 'no_hash'),

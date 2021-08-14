@@ -1,6 +1,8 @@
 
 import configparser
 import os
+import json
+import sys
 
 
 class config(object):
@@ -32,6 +34,27 @@ class config(object):
                 self.config['o_auth_data'] = a.get('data')
                 self.config['o_auth_mod'] = a.get('module')
                 self.config['o_auth_debug'] = a.getboolean('debug', fallback=False)
+            self.config['errands_acls'] = dict()
+            for section in configini:
+                # get errand access lists -- a list of strings follows
+                if section.startswith('errands_'):
+                    depl = section.split('_')[1]
+                    if depl not in self.config['errands_acls']:
+                        self.config['errands_acls'][depl] = dict()
+                    if 'o_debug' in self.config and self.config['o_debug']:
+                        print("section {}, deployment {}".format(section, depl))
+                    for key in configini[section]:
+                        try:
+                            value_json = json.loads(configini[section][key])
+                        except ValueError as e:
+                            print("Trouble parsing json section {} item {}: {} - {}".format(
+                                section, key, configini[section][key], e))
+                            sys.exit(1)
+                        if key not in ['allow']:
+                            print("Errand acls 'allow' only: found ", key)
+                            sys.exit(1)
+                        self.config['errands_acls'][depl][key] = value_json
+                        
         if 'o_debug' in self.config and self.config['o_debug']:
             print("Configuration")
             for k in self.config:

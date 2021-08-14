@@ -39,7 +39,7 @@ class TestConfig(flask_unittest.ClientTestCase):
         self.assertEqual(self.config['o_auth_type'], 'MOD')
 
     def test_app_deployment(self, client):
-        r = client.get('/deployment')
+        r = client.get('/version')
         self.assertEqual(r.json['git_hash'], '000000000')
         self.assertEqual(r.json['deployment_date'], '00-00-00')
         self.assertEqual(r.json['deployment_actor'], 'nobody')

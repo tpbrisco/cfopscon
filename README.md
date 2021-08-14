@@ -34,7 +34,7 @@ as well as under gunicorn to support the cf-push model of deployment.
 
 To run from the desktop:
  ```bash
-% OAUTHLIB_INSECURE_TRANSPORT=1 FLASK_APP='opcon.app:app' flask run
+% CONFIG_FILE=opcon.ini OAUTHLIB_INSECURE_TRANSPORT=1 FLASK_APP='opcon.app:app' flask run
 ```
 should result in a running system, accessible from localhost:5000.
 

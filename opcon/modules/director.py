@@ -209,11 +209,9 @@ class Director(object):
 
     def get_job_history(self, limit):
         '''get task histories'''
+        params = {'verbose': '2'}
         if limit:
-            params = {'limit': limit,
-                      'state': 'queued,processing,cancelled,cancelling,done,error,timeout'}
-        else:
-            params = {}
+            params['limit'] = limit
         task_h_r = self.session.get(self.bosh_url + '/tasks',
                                     params=params,
                                     verify=self.verify_tls)

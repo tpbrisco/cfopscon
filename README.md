@@ -60,6 +60,10 @@ Options are specified below, with any default value indicated first.
 - user=[_admin_, $BOSH_USERNAME] -- username for the BOSH login
 - pass=[_magic_, $BOSH_PASSWORD] -- password for the BOSH login
 - debug=[False, True] -- disable/enable debugging for the director code
+- readonly=[False, True] -- disable certain BOSH operations
+
+The _readonly_ flag disables start/stop/recreate operations on BOSH
+VMs.  Note that this does not disable errands (see below).
 
 ### auth options
   - type=MOD -- required, indicates loadable module

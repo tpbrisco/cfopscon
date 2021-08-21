@@ -55,7 +55,8 @@ director = director.Director(config.get('o_director_url'),
                              debug=config.get('o_debug'),
                              testing=config.get('o_testing'),
                              verify_tls=config.get('o_verify_tls'),
-                             errands=errands_acls)
+                             errands=errands_acls,
+                             readonly=config.get('o_readonly'))
 app.config.update({'AUTH': user_auth, 'DIRECTOR': director})
 app.config.update({
     'DEPLOYMENT_GITHASH': os.getenv('DEPLOYMENT_GITHASH', 'no_hash'),

@@ -36,7 +36,10 @@
 	<th colspan=3>Load</th><th>Mem% Used</th><th>Swap</th>
 	<th>Resurrection Paused?</th>
 	<th>State</th>
-	<th>Actions</th></thead>
+	{% if readonly == False %}
+	<th>Actions</th>
+	{% endif %}
+    </thead>
     <thead><tr><th></th><th></th><th><th>Sys</th><th>User</th><th>Wait</th>
     <th>1min</th><th>3min</th><th>5min</th></thead>
     {% for inst in deployment_vitals %}
@@ -49,6 +52,7 @@
       <td>{{ inst.vitals.swap.percent }}%</td>
       <td>{{ inst.resurrection_paused }}</td>
       <td>{{ inst.job_state }}</td>
+      {% if readonly == False %}
       <td>
 	<button type="button" class="btn-warning"
 		onclick="clickedOn( '{{inst.job_name}}/{{inst.id}}', 'restart' );"
@@ -63,6 +67,7 @@
 		onclick="clickedOn( '{{inst.job_name}}/{{inst.id}}', 'recreate' );"
 		vm="{{inst.job_name}}/{{inst.id}}">Recreate</button>
       </td>
+      {% endif %}
     </tr>
     {% endif %}
     {% endfor %}

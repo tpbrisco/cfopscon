@@ -19,6 +19,7 @@ class config(object):
                 self.config['o_verify_tls'] = g.getboolean('verify_tls',
                                                            fallback=True)
                 self.config['o_testing'] = g.getboolean('testing', fallback=False)
+                self.config['o_readonly'] = g.getboolean('readonly', fallback=False)
                 self.config['o_bosh_user'] = g.get('user',
                                                    fallback=os.getenv('BOSH_USERNAME', ''))
                 self.config['o_bosh_pass'] = g.get('pass',

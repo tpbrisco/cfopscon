@@ -147,6 +147,7 @@ def get_deployment_vitals_default():
     return render_template('bosh_vitals.html',
                            deployment_name=deployment,
                            deployments=director.deployments,
+                           readonly=director.readonly,
                            deployment_vitals=vitals)
 
 
@@ -181,6 +182,9 @@ def vm_control():
         skip_drain = False
     action_url = '{}/deployments/{}/instance_groups/{}/{}/actions/{}'.format(
         director.bosh_url, deployment, inst_group, inst, action)
+    if director.readonly:
+        return Response(status=403, content_type='application/json',
+                        response={'error': 'administratively denied'})
     a_r = director.session.post(action_url,
                                 params={'skip_drain': skip_drain},
                                 verify=director.verify_tls)

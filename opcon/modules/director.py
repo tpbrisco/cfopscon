@@ -35,6 +35,7 @@ class Director(object):
         self.testing = False
         self.verify_tls = True
         self.errands_acls = None
+        self.readonly = False
         if 'testing' in kwargs:
             self.testing = kwargs['testing']
         if 'debug' in kwargs:
@@ -43,6 +44,8 @@ class Director(object):
             self.verify_tls = kwargs['verify_tls']
             if self.verify_tls is False:
                 urllib3.disable_warnings()
+        if 'readonly' in kwargs:
+            self.readonly = kwargs['readonly']
         if 'errands' in kwargs:
             self.errands_acls = kwargs['errands']
         self.bosh_url = url

@@ -84,7 +84,8 @@ def get_task_output(taskid):
                              params={'type': output_type},
                              verify=director.verify_tls)
     if r.ok:
-        return Response(r.text, content_type='text/plain')
+        return Response(stream_with_context(r.iter_content(chunk_size=512 * 1024)),
+                        content_type='text/plain')
     else:
         return Response("error fetching task {} output".format(
             taskid) + r.text, content_type='text/plain')

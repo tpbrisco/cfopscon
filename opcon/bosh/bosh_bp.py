@@ -42,7 +42,7 @@ def bosh_logs():
 @accesslog.log_access
 def get_tasks():
     director = current_app.config['DIRECTOR']
-    limit = request.args.get('limit', default=0, type=int)
+    limit = request.args.get('limit', default=100, type=int)
     # return Response(director.get_job_history(limit),
     #                 content_type='application/json')
     return render_template('bosh_history.html',

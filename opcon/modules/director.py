@@ -224,7 +224,7 @@ class Director(object):
             return {}
 
     def __filter_errands(self, deployment, errand_list):
-        '''filter_errands(deployment_name, dictionary of errands) - return allowed errands'''
+        '''filter_errands(deployment_name, list of errands) - return allowed errands'''
         def deployment_errands_acl(deployment):
             for key in self.errands_acls.keys():
                 if deployment.startswith(key):
@@ -277,6 +277,9 @@ class Director(object):
     def run_deployment_errand(self, deployment, errand_name):
         '''run indicated errand for this deployment'''
         if deployment not in self.deployments:
+            return False
+        allowed_errands = self.__filter_errands(deployment, list(errand_name))
+        if errand_name not in allowed_errands:
             return False
         errand_url = '{}/deployments/{}/errands/{}/runs'.format(
             self.bosh_url,

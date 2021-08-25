@@ -10,7 +10,6 @@ from flask import (
     request,
     Response,
     redirect,
-    flash,
     url_for
 )
 from flask_apscheduler import APScheduler

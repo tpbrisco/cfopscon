@@ -98,11 +98,18 @@ def get_task_output(taskid):
 def cancel_task(taskid):
     director = current_app.config['DIRECTOR']
     task_url = '/task/{}'.format(taskid)
+    if director.readonly:
+        return Response(status=403, content_type='application/json',
+                        response=json.dumps({'error': 'administratively denied'}))
     r = director.session.delete(director.bosh_url + task_url)
     if r.ok:
-        return Response("{}", status=r.status)
+        return Response(status=r.status_code,
+                        response=r.text,
+                        content_type='text/plain')
     else:
-        return Response(r.text, status=r.status)
+        return Response(status=r.status_code,
+                        response=r.content,
+                        content_type='text/plain')
 
 
 @bosh_bp.route('/deployment/errands', methods=['GET'])

@@ -55,8 +55,9 @@ def get_tasks():
 def download_logs(taskid):
     director = current_app.config['DIRECTOR']
     t = None
-    for t in director.pending_tasks:
-        if "/tasks/{}".format(taskid) == t.t_url:
+    for task in director.pending_tasks:
+        if "/tasks/{}".format(taskid) == task.t_url:
+            t = task
             break
     if t is None:
         return Response('Could not find task', 404)

@@ -179,6 +179,9 @@ def vm_control():
     action = request.args.get('action')
     skip_drain = request.args.get('skip_drain')
     inst_group, inst = vmi.split('/')
+    if director.readonly:
+        return Response(status=403, content_type='application/json',
+                        response={'error': 'administratively denied'})
     if deployment is None or vmi is None or inst_group is None or inst is None:
         return Response("{'error': 'deployment, vm required (vm as vm/guid or vm/index)'}",
                         status=400,
@@ -191,9 +194,6 @@ def vm_control():
         skip_drain = False
     action_url = '{}/deployments/{}/instance_groups/{}/{}/actions/{}'.format(
         director.bosh_url, deployment, inst_group, inst, action)
-    if director.readonly:
-        return Response(status=403, content_type='application/json',
-                        response={'error': 'administratively denied'})
     a_r = director.session.post(action_url,
                                 params={'skip_drain': skip_drain},
                                 verify=director.verify_tls)

@@ -1,6 +1,7 @@
 opcon*ini
 !opcon-sample.ini
 dev
+bin
 *~
 *pyc
 opcon.ini

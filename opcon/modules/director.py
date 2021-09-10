@@ -284,7 +284,7 @@ class Director(object):
         '''run indicated errand for this deployment'''
         if deployment not in self.deployments:
             return False
-        allowed_errands = self.__filter_errands(deployment, list(errand_name))
+        allowed_errands = self.__filter_errands(deployment, [errand_name])
         if errand_name not in allowed_errands:
             return False
         errand_url = '{}/deployments/{}/errands/{}/runs'.format(

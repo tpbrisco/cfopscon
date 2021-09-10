@@ -74,14 +74,29 @@ VMs.  Note that this does not disable errands (see below).
 ### errands\__deployment-prefix_ options
 - allow=["regexp", "regexp"]
 
-> Sections named "errands_[deployment]" contain an "allow" ACL of errands
-> that can be run for the matching deployment.  If a deployment name
-> starts with "depl-prefix", then the list of errand regular expressions
-> will be applied as an ACL indicating whcih errands can be run.  If there is
-> no errand ACL for a deployment, the default is to allow all errands.
+Sections named "errands\_deployment-prefix" contain an "allow" ACL of errands
+that can be run for the matching deployment.  If a deployment name
+starts with "deployment-prefix", then the list of errand regular expressions
+will be applied as an ACL indicating which errands can be run.  If there is
+no section for a deployment and no entry for "\*" exists, the default is to allow all errands.
+
+The _deployment-prefix_ can be "errands_\*" to match any deployments
+without a specific configuration (that is; it matches any deployment
+not otherwise specified).
+The _allow=_ configuration may be missing, indicating that nothing is
+allowed.
+
+A good way to allow "status.\*" errands for zookeeper, and no other
+errands would be:
+```
+[errand_zookeep]
+allow=["status.*"]
+[errand_*]
+```
+
 
 ## Limitations
-- running multiple instances of the process running doesn't work
+- running multiple instances of the process doesn't work as expected
 >  The user database is an in-RAM database, so of course moving across
 >  CF instances doesn't work.  An alternatives involve external K/V
 >  stores, and it's not clear if usage will be such that that is worth
@@ -101,7 +116,6 @@ should yield predictable results.
 - improve bosh tasks/errands output collection - auto-refresh events/debug output?
 - allow errand flags (e.g. specify the instance)
 - remove passwords from INI file
-- home page statistics -- include "interesting" stats about BOSH, CF
 - Investigate and support bosh-cli-like syntax "bosh logs compute" for
   logs from all "compute" jobs.
 - "flash" updates on the status of things in wait;  E.g. waiting on a

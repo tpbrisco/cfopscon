@@ -229,6 +229,9 @@ class Director(object):
             for key in self.errands_acls.keys():
                 if deployment.startswith(key):
                     return self.errands_acls[key]
+            if '*' in self.errands_acls.keys():
+                # "wildcard" default if no explict prefix match
+                return self.errands_acls['*']
             return None
         # find allow list in self
         if self.errands_acls is None:
@@ -240,6 +243,9 @@ class Director(object):
             # allow all if no allow-lists specified for this deployment
             return errand_list
         valid_errands = list()
+        if 'allow' not in errands_allowed:
+            # if no "allow" section exists, nothing is allowed
+            return valid_errands
         for k in errand_list:
             for allowed_errand_re in errands_allowed['allow']:
                 if re.match(allowed_errand_re, k):

@@ -3,7 +3,7 @@ import json
 from opcon.modules import boshforms
 from opcon.modules import accesslog
 import flask_login
-from flask import current_app, request
+from flask import current_app, request, jsonify
 from flask import Response, stream_with_context
 from flask import Blueprint, render_template
 
@@ -27,14 +27,18 @@ def bosh_logs():
         else:
             print('form.errors:{}'.format(form.errors), file=sys.stderr)
     deployment = form.deployment.data
-    if deployment == '':
+    if deployment == '' or deployment is None:
         deployment = director.deployments[0]
-    return render_template('bosh.html',
-                           form=boshforms.BoshLogsForm(),
-                           deployment_name=deployment,
-                           deployments=director.deployments,
-                           jobs=director.get_deployment_jobs(deployment),
-                           tasks=director.pending_tasks)
+    best_response = request.accept_mimetypes.best_match(["application/json",
+                                                         "text/html"])
+    if best_response == 'text/html':
+        return render_template('bosh.html',
+                               form=boshforms.BoshLogsForm(),
+                               deployment_name=deployment,
+                               deployments=director.deployments,
+                               jobs=director.get_deployment_jobs(deployment),
+                               tasks=director.pending_tasks)
+    return jsonify(director.pending_tasks)
 
 
 @bosh_bp.route('/tasks', methods=['GET'])

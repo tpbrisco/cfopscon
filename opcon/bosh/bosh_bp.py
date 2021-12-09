@@ -138,7 +138,7 @@ def get_deployment_errands():
 @accesslog.log_access
 def run_deployment_errand(deployment, errand):
     director = current_app.config['DIRECTOR']
-    running = director.run_deployment_errand(deployment, errand)
+    running, link = director.run_deployment_errand(deployment, errand)
     if running:
         rcode = 200
     else:

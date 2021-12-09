@@ -283,10 +283,10 @@ class Director(object):
     def run_deployment_errand(self, deployment, errand_name):
         '''run indicated errand for this deployment'''
         if deployment not in self.deployments:
-            return False
+            return False, ''
         allowed_errands = self.__filter_errands(deployment, [errand_name])
         if errand_name not in allowed_errands:
-            return False
+            return False, ''
         errand_url = '{}/deployments/{}/errands/{}/runs'.format(
             self.bosh_url,
             deployment,
@@ -300,16 +300,16 @@ class Director(object):
         if not errand_resp.status_code == 302:
             print("error calling errand {} for {}: {}".format(
                 errand_name, deployment, errand_resp.text))
-            return False
+            return False, ''
         # we should have the URL to follow for this
         errand_results_url = urlparse(errand_resp.headers['Location']).path
         if self.debug:
-            print("errand talk:", errand_results_url)
+            print("errand task:", errand_results_url)
         # this doesn't seem to actually leave output cleanly
         # self.pending_tasks.append(task_logs(TASK_LOGS,
         #                                     "%s %s" % (deployment, errand_name),
         #                                     errand_results_url))
-        return True
+        return True, errand_results_url
 
     def get_deployment_vitals_submit_task(self, deployment):
         if deployment not in self.deployments:

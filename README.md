@@ -86,6 +86,9 @@ not otherwise specified).
 The _allow=_ configuration may be missing, indicating that nothing is
 allowed.
 
+Avoid surprises when allowing "status", when what you really mean is
+"^status$".
+
 A good way to allow "status.\*" errands for zookeeper, and no other
 errands would be:
 ```

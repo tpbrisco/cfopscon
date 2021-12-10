@@ -285,6 +285,8 @@ class Director(object):
         if deployment not in self.deployments:
             return False, ''
         allowed_errands = self.__filter_errands(deployment, [errand_name])
+        if self.debug:
+            print("allowed errands:", allowed_errands)
         if errand_name not in allowed_errands:
             return False, ''
         errand_url = '{}/deployments/{}/errands/{}/runs'.format(
@@ -305,6 +307,7 @@ class Director(object):
         errand_results_url = urlparse(errand_resp.headers['Location']).path
         if self.debug:
             print("errand task:", errand_results_url)
+            print("errand status", errand_resp.status_code, "content:", errand_resp.content)
         # this doesn't seem to actually leave output cleanly
         # self.pending_tasks.append(task_logs(TASK_LOGS,
         #                                     "%s %s" % (deployment, errand_name),

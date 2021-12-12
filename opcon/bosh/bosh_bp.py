@@ -181,7 +181,7 @@ def vm_control():
     deployment = request.args.get('deployment')
     vmi = request.args.get('vmi')
     action = request.args.get('action')
-    skip_drain = request.args.get('skip_drain')
+    skip_drain = request.args.get('skip_drain', default=False)
     inst_group, inst = vmi.split('/')
     if director.readonly:
         return Response(status=403, content_type='application/json',
@@ -194,8 +194,6 @@ def vm_control():
         return Response("{'error': 'action is required: restart,recreate,stop,start'}",
                         status=400,
                         content_type='application/json')
-    if skip_drain is None:
-        skip_drain = False
     action_url = '{}/deployments/{}/instance_groups/{}/{}/actions/{}'.format(
         director.bosh_url, deployment, inst_group, inst, action)
     a_r = director.session.post(action_url,
@@ -206,7 +204,7 @@ def vm_control():
     if a_r.ok:
         return Response(status=a_r.status_code,
                         content_type='application/json',
-                        response=a_r.json())
+                        response=json.dumps(a_r.json()))
     else:
         error_msg = {'error': a_r.text}
         return Response(error_msg,

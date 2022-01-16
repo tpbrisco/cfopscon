@@ -35,6 +35,10 @@ class config(object):
                 self.config['o_auth_data'] = a.get('data')
                 self.config['o_auth_mod'] = a.get('module')
                 self.config['o_auth_debug'] = a.getboolean('debug', fallback=False)
+            if 'api' in configini:
+                a = configini['api']
+                self.config['o_api_enable'] = a.getboolean('enable')
+                self.config['o_api_debug'] = a.getboolean('debug')
             self.config['errands_acls'] = dict()
             for section in configini:
                 # get errand access lists -- a list of strings follows
@@ -55,7 +59,7 @@ class config(object):
                             print("Errand acls 'allow' only: found ", key)
                             sys.exit(1)
                         self.config['errands_acls'][depl][key] = value_json
-                        
+
         if 'o_debug' in self.config and self.config['o_debug']:
             print("Configuration")
             for k in self.config:

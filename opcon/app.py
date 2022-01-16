@@ -4,6 +4,7 @@ from opcon.modules import auth
 from opcon.modules import config
 from opcon.modules import accesslog
 from opcon.bosh.bosh_bp import bosh_bp
+from opcon.api.api_bp import api_bp
 from flask import (
     Flask,
     render_template,
@@ -187,6 +188,9 @@ def logout():
 
 
 app.register_blueprint(bosh_bp, url_prefix='/bosh')
+print("api enabled:", config.get('o_api_enable'))
+if config.get('o_api_enable'):
+    app.register_blueprint(api_bp, url_prefix='/api')
 
 
 if not director.connect() and not config.get('o_testing'):

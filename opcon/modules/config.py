@@ -37,8 +37,8 @@ class config(object):
                 self.config['o_auth_debug'] = a.getboolean('debug', fallback=False)
             if 'api' in configini:
                 a = configini['api']
-                self.config['o_api_enable'] = a.getboolean('enable')
-                self.config['o_api_debug'] = a.getboolean('debug')
+                self.config['o_api_enable'] = a.getboolean('enable', fallback=False)
+                self.config['o_api_debug'] = a.getboolean('debug', fallback=False)
             self.config['errands_acls'] = dict()
             for section in configini:
                 # get errand access lists -- a list of strings follows

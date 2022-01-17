@@ -1,10 +1,11 @@
 import sys
 import json
+import requests
 from opcon.modules import accesslog
 import flask_login
 from flask import current_app, request
-from flask import Response, stream_with_context
-from flask import Blueprint, render_template
+from flask import Response, stream_with_context, redirect
+from flask import Blueprint
 
 api_bp = Blueprint('api_bp', __name__,
                    template_folder='templates',
@@ -21,6 +22,42 @@ def v1_usage():
         status=200,
         mimetype='application/json')
 
+
+# v1/auth - authorize
+@api_bp.route('/v1/auth')
+def v1_auth():
+    auth = current_app.config['AUTH']
+    if auth.ua_lib.auth_type != 'oidc':
+        return Response(json.dumps({"status": "error",  "message": "bad auth configured"}),
+                        status=500, mimetype='application//json')
+    request_url = "{}?response_type=code&client_id={}&redirect_uri={}&scope=openid+email+profile&prompt=login".format(
+            auth.ua_lib.oidc_config['authorization_endpoint'],
+            auth.ua_lib.client_id,
+            auth.ua_lib.base_url + "/api/v1/_callback")
+    return redirect(request_url, 302)
+
+
+# v1/_callback - authorization callback
+@api_bp.route('/v1/_callback')
+def v1_callback():
+    auth = current_app.config['AUTH']
+    code = request.args.get("code")
+    token_url, headers, body = auth.ua_lib.prepare_token_request(code)
+    token_r = requests.post(
+        token_url,
+        headers=headers,
+        data=body,
+        auth=(auth.ua_lib.client_id, auth.ua_lib.client_secret))
+    if not token_r.ok:
+        print("Failed to get token from {}: {}".format(token_url, token_r.text))
+        return Response(json.dumps({"status": "error", "message": token_r.text}),
+                        status=500, mimetype='application/json')
+    token_dict = token_r.json()
+    username = auth.ua_lib.get_user_from_token(token_dict['id_token'])
+    auth.login_user(username, token_dict)
+    return Response(json.dumps({"status": "ok",
+                                "message": "logged as {}".format(username)}),
+                    status=200, mimetype='application/json')
 
 # v1/tasks - return list of previous tasks
 @api_bp.route('/v1/tasks')
@@ -171,4 +208,3 @@ def v1_deployment_errands_run(deployment, errand):
         rcode = 400
         status = 'permission denied'
     return Response(json.dumps({"status": status, "link": link}), status=rcode)
-

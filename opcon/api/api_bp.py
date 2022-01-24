@@ -20,7 +20,7 @@ def v1_usage():
     return Response(
         json.dumps({"status": "ok", "message": "usage"}),
         status=200,
-        mimetype='application/json')
+        content_type='application/json; charset=UTF-8')
 
 
 # v1/auth - authorize
@@ -29,7 +29,7 @@ def v1_auth():
     auth = current_app.config['AUTH']
     if auth.ua_lib.auth_type != 'oidc':
         return Response(json.dumps({"status": "error",  "message": "bad auth configured"}),
-                        status=500, mimetype='application//json')
+                        status=500, content_type='application//json; charset=UTF-8')
     request_url = "{}?response_type=code&client_id={}&redirect_uri={}&scope=openid+email+profile&prompt=login".format(
             auth.ua_lib.oidc_config['authorization_endpoint'],
             auth.ua_lib.client_id,
@@ -51,13 +51,13 @@ def v1_callback():
     if not token_r.ok:
         print("Failed to get token from {}: {}".format(token_url, token_r.text))
         return Response(json.dumps({"status": "error", "message": token_r.text}),
-                        status=500, mimetype='application/json')
+                        status=500, content_type='application/json; charset=UTF-8')
     token_dict = token_r.json()
     username = auth.ua_lib.get_user_from_token(token_dict['id_token'])
     auth.login_user(username, token_dict)
     return Response(json.dumps({"status": "ok",
                                 "message": "logged as {}".format(username)}),
-                    status=200, mimetype='application/json')
+                    status=200, content_type='application/json; charset=UTF-8')
 
 # v1/tasks - return list of previous tasks
 @api_bp.route('/v1/tasks')
@@ -66,17 +66,18 @@ def v1_tasks():
     limit = request.args.get('limit', default=100, type=int)
     return Response(
         json.dumps({"status": "ok", "limit": limit, "results": director.get_job_history(limit)}),
-        status=200, mimetype='application/json')
+        status=200, content_type='application/json; charset=UTF-8')
 
 
 # v1/tasks/<taskid>/<action>
 # Perform result/debug/event/cancel on the task
-@api_bp.route('/v1/tasks/<taskid>/<out_type>')
+@api_bp.route('/v1/task/<taskid>/<out_type>')
 def v1_tasks_id_action(taskid, out_type):
     director = current_app.config['DIRECTOR']
     if out_type not in ["result", "debug", "event", "cancel"]:
         return Response(
             json.dumps({"status": "error", "message": "result, debug, event, cancel"}),
+            content_type='application/json; charset=UTF-8',
             status=404)
     task_url = '/tasks/{}/output'.format(taskid)
     r = director.session.get(director.bosh_url + task_url,
@@ -84,9 +85,10 @@ def v1_tasks_id_action(taskid, out_type):
                              verify=director.verify_tls)
     if r.ok:
         return Response(stream_with_context(r.iter_content(chunk_size=512*1024)),
-                        content_type='text/plain', status=r.status_code)
+                        content_type='text/plain; charset=UTF-8', status=r.status_code)
     return Response(
         json.dumps({"status": "error", "message": r.content}),
+        content_type='application/json; charset=UTF-8',
         status=r.status_code)
 
 
@@ -121,7 +123,7 @@ def v1_deployments():
 def v1_deployment_jobs(deployment):
     director = current_app.config['DIRECTOR']
     return Response(json.dumps(director.get_deployment_jobs(deployment)),
-                    content_type='application/json')
+                    content_type='application/json; charset=UTF-8')
 
 
 # v1/deployment/<deployment>/job/<job>/<instance>/<action>
@@ -131,6 +133,7 @@ def v1_deployment_job_actions(deployment, job, instance, action):
     if action not in ["restart", "stop", "start", "recreate"]:
         return Response(
             json.dumps({"status": "error", "message": "action from restart, stop, start, recreate"}),
+            content_type='application/json; charset=UTF-8',
             status=404)
     skip_drain = request.args.get('skip_drain', default=False)
     action_url = '{}/deployments/{}/instance_groups/{}/{}/actions/{}'.format(
@@ -140,13 +143,13 @@ def v1_deployment_job_actions(deployment, job, instance, action):
                               verify=director.verify_tls)
     if r.ok:
         return Response(status=r.status_code,
-                        content_type='application/json',
+                        content_type='application/json; charset=UTF-8',
                         response=json.dumps(r.json()))
     else:
         error = {'status': 'error', 'message': r.content}
         return Response(response=json.dumps(error),
                         status=r.status_code,
-                        content_type='application/json')
+                        content_type='application/json; charset=UTF-8')
 
 
 # v1/logs - return list of logs from previous "bosh logs" statements
@@ -159,7 +162,9 @@ def v1_list_task_logs():
     }
     for pt in director.pending_tasks:
         message_d['data'].append(pt.__dict__)
-    return Response(json.dumps(message_d))
+    return Response(json.dumps(message_d),
+                    status=200,
+                    content_type='applicatoin/json; charset=UTF-8')
 
 
 # v1/logs/<taskid> - stream the logs for this task
@@ -181,9 +186,13 @@ def v1_stream_task_log(taskid):
 def v1_submit_logs_job(deployment, job, instance):
     director = current_app.config['DIRECTOR']
     if director.submit_logs_job(deployment, "{}/{}".format(job, instance)):
-        return Response(json.dumps({"status": "ok", "message": "submitted"}))
+        return Response(json.dumps({"status": "ok", "message": "submitted"}),
+                        status=200,
+                        content_type='application/json; charset=UTF-8')
     else:
-        return Response(json.dumps({"status": "error"}), status=404)
+        return Response(json.dumps({"status": "error"}),
+                        status=404,
+                        content_type='application/json; charset=UTF-8')
 
 
 # v1/deployment/<deployment>/errands
@@ -192,7 +201,9 @@ def v1_submit_logs_job(deployment, job, instance):
 def v1_deployment_errands(deployment):
     director = current_app.config['DIRECTOR']
     errands = director.get_deployment_errands(deployment)
-    return Response(json.dumps(errands), mimetype='application/json')
+    return Response(json.dumps(errands),
+                    status=200,
+                    content_type='application/json; charset=UTF-8')
 
 
 # v1/deployment/<deployment>/errand/<errand>/run
@@ -207,4 +218,6 @@ def v1_deployment_errands_run(deployment, errand):
     else:
         rcode = 400
         status = 'permission denied'
-    return Response(json.dumps({"status": status, "link": link}), status=rcode)
+    return Response(json.dumps({"status": status, "link": link}),
+                    status=rcode,
+                    content_type='application/json; charset=UTF-8')

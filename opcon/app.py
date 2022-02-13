@@ -40,6 +40,7 @@ if config.get('o_auth_type'):
     app.config['USER_AUTH_DATA'] = config.get('o_auth_data')
     app.config['USER_AUTH_MOD'] = config.get('o_auth_mod')
     app.config['USER_AUTH_DEBUG'] = config.get('o_auth_debug')
+    app.config['USER_AUTH_BRAND'] = config.get('o_auth_brand')
 else:
     print("No auth type configured; this isn't going to go well", file=sys.stderr)
     sys.exit(1)

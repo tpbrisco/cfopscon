@@ -35,6 +35,7 @@ class config(object):
                 self.config['o_auth_data'] = a.get('data')
                 self.config['o_auth_mod'] = a.get('module')
                 self.config['o_auth_debug'] = a.getboolean('debug', fallback=False)
+                self.config['o_auth_brand'] = a.get('brand', fallback='')
             if 'api' in configini:
                 a = configini['api']
                 self.config['o_api_enable'] = a.getboolean('enable', fallback=False)

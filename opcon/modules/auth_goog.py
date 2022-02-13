@@ -22,6 +22,8 @@ class UserAuth(object):
         self.debug = appopt.config['USER_AUTH_DEBUG']
         self.auth_type = 'oidc'  # for app.py:login() method
         self.auth_brand = 'Google'
+        if len(appopt.config['USER_AUTH_BRAND']):
+            self.auth_brand = appopt.config['USER_AUTH_BRAND']
         self.discovery = self.oidc_url + '/.well-known/openid-configuration'
         r = requests.get(self.discovery)
         if not r.ok:

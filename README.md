@@ -69,6 +69,7 @@ VMs.  Note that this does not disable errands (see below).
   - type=MOD -- required, indicates loadable module
   - module=_module.py_ - module located in modules/ area
   - data=_mod\_specific_ - module-specific comma-seperated list
+  - brand=_string_ - branding name for redirect pages
   - debug=_False_ - module-specific debugging
 
 ### errands\__deployment-prefix_ options

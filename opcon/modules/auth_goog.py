@@ -28,6 +28,10 @@ class UserAuth(object):
             print("Error discovering {} endpoints: {}".format(self.auth_brand, r.text), file=sys.stderr)
             sys.exit(1)
         self.oidc_config = r.json()
+        if self.debug:
+            with open("/tmp/oidc-config.json", "w") as f:
+                print("oidc_config: ", json.dumps(self.oidc_config, indent=2), file=f)
+            print("OpenID config at /tmp/oidc-config.json")
         self.code_request_uri = "{}?response_type=code&client_id={}&redirect_uri={}&scope=openid+email+profile&prompt=login".format(
             self.oidc_config['authorization_endpoint'],
             self.client_id,
@@ -91,7 +95,7 @@ class UserAuth(object):
             return False
         header, id_token, tail = token_d['id_token'].split('.')
         id_token = self.b64repad(id_token)
-        id_dict = json.loads(base64.b64decode(id_token))
+        id_dict = json.loads(self.b64decode(id_token))
         self.ug_hash[username] = id_dict['exp']
         if self.debug:
             print("oidc user_auth({}) good until {}".format(username, self.ug_hash[username]))
@@ -116,8 +120,14 @@ class UserAuth(object):
             return token
         return token + "=" * pad_len
 
+    def b64decode(self, string):
+        '''a version of b64decode that figures out which version of base64 is being used'''
+        if '_' in string:
+            return base64.urlsafe_b64decode(string)
+        return base64.b64decode(string)
+
     def get_user_from_token(self, token):
         header, id_token, tail = token.split('.')
         id_token = self.b64repad(id_token)
-        id_dict = json.loads(base64.b64decode(id_token))
+        id_dict = json.loads(self.b64decode(id_token))
         return id_dict['email']

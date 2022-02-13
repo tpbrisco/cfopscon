@@ -91,7 +91,6 @@ class UserAuth(object):
 
     def user_auth(self, username, token_d):
         # real auth is done in app.py:login_callback(), and user token fetched from there
-        print("token:", token_d)
         claims = self.validate_access_token(token_d['access_token'])
         if claims is None:
             return False
@@ -132,4 +131,10 @@ class UserAuth(object):
         header, id_token, tail = token.split('.')
         id_token = self.b64repad(id_token)
         id_dict = json.loads(self.b64decode(id_token))
+        if self.debug:
+            username = id_dict['email']
+            fname = f'/tmp/{username}-token.json'
+            print("dumping user_auth token to", fname)
+            with open(fname, 'w') as f:
+                print(json.dumps(id_dict, indent=2), file=f)
         return id_dict['email']

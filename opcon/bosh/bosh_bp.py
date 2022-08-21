@@ -36,7 +36,7 @@ def bosh_logs():
                                form=boshforms.BoshLogsForm(),
                                deployment_name=deployment,
                                deployments=director.deployments,
-                               jobs=director.get_deployment_jobs(deployment),
+                               jobs=sorted(director.get_deployment_jobs(deployment)),
                                tasks=director.pending_tasks)
     return jsonify(director.pending_tasks)
 

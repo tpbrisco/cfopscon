@@ -157,11 +157,13 @@ def get_deployment_vitals_default():
     if deployment is None:
         deployment = director.deployments[0]
     vitals = director.get_deployment_vitals(deployment)
+    # sort by job_name/id
+    sorted_vitals = sorted(vitals, key=lambda d: d['job_name'] + "/" + d['id'])
     return render_template('bosh_vitals.html',
                            deployment_name=deployment,
                            deployments=director.deployments,
                            readonly=director.readonly,
-                           deployment_vitals=vitals)
+                           deployment_vitals=sorted_vitals)
 
 
 @bosh_bp.route('/deployment/<deployment>/jobs', methods=['GET'])

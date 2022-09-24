@@ -4,3 +4,6 @@ applications:
   instances: 1
   buildpacks:
    - python_buildpack
+  env:
+    PIP_NO_WARN_SCRIPT_LOCATION: 0
+

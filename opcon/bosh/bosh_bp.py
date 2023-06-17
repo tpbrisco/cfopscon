@@ -133,7 +133,7 @@ def get_deployment_errands():
                            deployment_errands=errands)
 
 
-@bosh_bp.route('/deployment/<deployment>/errand/<errand>/run')
+@bosh_bp.route('/deployment/<deployment>/errand/<errand>/run', methods=['GET'])
 @flask_login.login_required
 @accesslog.log_access
 def run_deployment_errand(deployment, errand):

@@ -51,7 +51,7 @@ Or, for cloud foundry foundations
 ## Options
 Options and configuration are contained in the "opcon.ini" file (or
 file specified by the CONFIG_FILE environment variable).  It is broken
-into 3 sections - "bosh", "auth" and deployment errand ACLs.
+into 4 sections - "bosh", "auth", "audit" and deployment errand ACLs.
 
 Options are specified below, with any default value indicated first.
 ### bosh options
@@ -71,6 +71,22 @@ VMs.  Note that this does not disable errands (see below).
   - data=_mod\_specific_ - module-specific comma-seperated list
   - brand=_string_ - branding name for redirect pages
   - debug=_False_ - module-specific debugging
+
+### audit
+- enable=["False", "True"]
+- data=app_name,log_type,username,password,url
+
+"App_name" is how the application will identify itself, the log type
+may be "audit" or something similar, the audit logging assumes basic
+auth (username, password) or no authentication to the indicated URL
+which will be used for POST operations.
+
+The data logged is a JSON object indicating person logged in
+(username), the IP address from which they are connecting (origin),
+the time that the request was received (receive_time), and the URL
+(path), HTTP operation (http_method), and parameters (query).  The
+application name and log class (from the parameters) are included as
+well.
 
 ### errands\__deployment-prefix_ options
 - allow=["regexp", "regexp"]

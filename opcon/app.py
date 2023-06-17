@@ -3,6 +3,7 @@ from opcon.modules import director
 from opcon.modules import auth
 from opcon.modules import config
 from opcon.modules import accesslog
+from opcon.modules import auditlog
 from opcon.bosh.bosh_bp import bosh_bp
 from opcon.api.api_bp import api_bp
 from flask import (
@@ -64,6 +65,10 @@ app.config.update({
     'DEPLOYMENT_DATE': os.getenv('DEPLOYMENT_DATE', time.asctime()),
     'DEPLOYMENT_ACTOR': os.getenv('DEPLOYMENT_ACTOR', 'unknown')
     })
+
+if config.get('o_audit_enable'):
+    auditlog = auditlog.AuditLog(config.get('o_audit_data'))
+    app.config.update({'AUDIT': auditlog})
 
 
 # add jinja template for converting "Epoch" dates to time strings

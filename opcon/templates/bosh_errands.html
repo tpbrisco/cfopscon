@@ -33,14 +33,16 @@
   </form>
   <table class="table table-striped table-bordered">
     <thead><tr><th>Name</th><th>Run</th></thead>
-    {% for errand in deployment_errands %}
-    <tr><td>{{errand}}</td>
-      <td>
-	<button type="button" class="btn-warning"
-		onclick="clickedOn( '{{errand}}' );">Run</button>
-      </td>
-    </tr>
-    {% endfor %}
+    {% if deployment_errands is iterable and deployment_errands|length > 0 %}
+     {% for errand in deployment_errands %}
+     <tr><td>{{errand}}</td>
+       <td>
+ 	<button type="button" class="btn-warning"
+ 		onclick="clickedOn( '{{errand}}' );">Run</button>
+       </td>
+     </tr>
+     {% endfor %}
+    {% endif %}
   </table>
 </div>
 {% endblock %}

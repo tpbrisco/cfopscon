@@ -67,7 +67,9 @@ app.config.update({
     })
 
 if config.get('o_audit_enable'):
-    auditlog = auditlog.AuditLog(config.get('o_audit_data'))
+    auditlog = auditlog.AuditLog(config.get('o_audit_data'),
+                                 extra_fields=config.get('o_audit_extra_fields'),
+                                 debug=config.get('o_audit_debug'))
     app.config.update({'AUDIT': auditlog})
 
 

@@ -46,6 +46,8 @@ class config(object):
                 a = configini['audit']
                 self.config['o_audit_enable'] = a.getboolean('enable', fallback=False)
                 self.config['o_audit_data'] = a.get('data', fallback='')
+                self.config['o_audit_extra_fields'] = a.get('extra_fields', fallback='')
+                self.config['o_audit_debug'] = a.get('debug', fallback=False)
             else:
                 self.config['o_audit_enable'] = False
 

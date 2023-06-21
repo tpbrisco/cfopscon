@@ -19,6 +19,7 @@ class AuditLog(object):
         self.debug = False
         self.test = False   # stub for testing mode?
         self.active = True    # if audit logging is enabled, and not encountered an error
+        self.extra_fields = {}
 
         if 'verify_tls' in kwargs:
             self.verify_tls = kwargs['verify_tls']
@@ -28,6 +29,13 @@ class AuditLog(object):
             self.debug = kwargs['debug']
         if 'test' in kwargs:
             self.test = kwargs['test']
+        if 'extra_fields' in kwargs and kwargs['extra_fields'] != '':
+            try:
+                self.extra_fields = json.loads(kwargs['extra_fields'])
+            except ValueError as e:
+                print("Trouble parsing json section audit item extra_fields: {} - {}".format(
+                    kwargs['extra_fields'], e))
+                raise ValueError
 
         if self.debug:
             print(f"audit log: debug={self.debug} test={self.test} vrfy_tls={self.verify_tls}")
@@ -50,7 +58,8 @@ class AuditLog(object):
             return
         jobj['application'] = self.app_name
         jobj['log_type'] = self.log_name
-        log_list = [jobj]
+        log_dict = {**jobj, **self.extra_fields}
+        log_list = [log_dict]
         if self.debug:
             print("send to ", self.url, type(jobj), json.dumps(log_list))
         r = self.session.post(self.url, json=log_list)

@@ -75,7 +75,7 @@ VMs.  Note that this does not disable errands (see below).
 ### audit
 - enable=["False", "True"]
 - data=app_name,log_type,username,password,url
-- extra_fields="<json structure>"
+- extra_fields=<json dict>
 
 "App_name" is how the application will identify itself, the log type
 may be "audit" or something similar, the audit logging assumes basic

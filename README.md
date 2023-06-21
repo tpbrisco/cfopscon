@@ -75,6 +75,7 @@ VMs.  Note that this does not disable errands (see below).
 ### audit
 - enable=["False", "True"]
 - data=app_name,log_type,username,password,url
+- extra_fields="<json structure>"
 
 "App_name" is how the application will identify itself, the log type
 may be "audit" or something similar, the audit logging assumes basic
@@ -86,7 +87,7 @@ The data logged is a JSON object indicating person logged in
 the time that the request was received (receive_time), and the URL
 (path), HTTP operation (http_method), and parameters (query).  The
 application name and log class (from the parameters) are included as
-well.
+well.  This object is merged with the dict from 'extra_fields' if it is provided.
 
 ### errands\__deployment-prefix_ options
 - allow=["regexp", "regexp"]

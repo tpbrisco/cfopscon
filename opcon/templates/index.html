@@ -8,7 +8,7 @@
     <tr><th>Director</th><th>Deployment</th><td>VMs</td></tr>
   </thead>
   <tbody>
-    {% for d in director.deployments %}
+    {% for d in director.deployments|sort %}
     <tr><td>{{ director.bosh_url }}</td><td>{{ d }}</td><td>{{ stats[d] }}</td></tr>
     {% endfor %}
   </tbody>

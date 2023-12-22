@@ -171,7 +171,8 @@ def get_deployment_vitals_default():
 @accesslog.log_access
 def get_deployment_jobs(deployment):
     director = current_app.config['DIRECTOR']
-    return Response(json.dumps(director.get_deployment_jobs(deployment)),
+    sorted_jobs = sorted(director.get_deployment_jobs)
+    return Response(json.dumps(sorted_jobs),
                     content_type='application/json')
 
 

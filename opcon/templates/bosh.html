@@ -9,7 +9,7 @@
 	<div class="form-group col-md-6">
 	  {{ form.deployment.label }}
 	  <select class="form-control"  id="deployment_list" name="deployment">
-	    {% for d in deployments %}
+	    {% for d in deployments|sort %}
 	     {% if deployment_name == d %}
 	     <option selected> {{ d }}</option>
 	     {% else %}
@@ -22,7 +22,7 @@
 	  {{ form.jobs.label }}
 	  <select class="form-control" id="deployment_jobs" name="jobs">
 	    <!-- {{ jobs }} -->
-	    {% for j in jobs %}
+	    {% for j in jobs|sort %}
 	    <option>{{ j }}</option>
 	    {% endfor %}
 	  </select>

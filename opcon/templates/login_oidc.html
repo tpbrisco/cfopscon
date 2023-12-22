@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Login{% endblock %}
 {% block content %}
-Click <a href="{{ ua_action|safe }}">here</a> to login with {{ ua_brand }}.
+<div class="col-md-8 offset-md-2">
+<form class="form form-horizontal" method="POST" action="{{ ua_action |safe}}"
+<p>Login with <input type="submit" value="{{ ua_brand }}"/></p>
+</form>
 </div>
 {% endblock %}

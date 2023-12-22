@@ -17,7 +17,7 @@
     <div class="form-row">
       <div class="form-group col-md-6">
 	   <select class="form-control" id="deployment_list" name="deployment">
-	     {% for d in deployments %}
+	     {% for d in deployments|sort %}
 	     {% if deployment_name == d %}
 	     <option selected> {{ d }}</option>
 	     {% else %}
@@ -34,7 +34,7 @@
   <table class="table table-striped table-bordered">
     <thead><tr><th>Name</th><th>Run</th></thead>
     {% if deployment_errands is iterable and deployment_errands|length > 0 %}
-     {% for errand in deployment_errands %}
+     {% for errand in deployment_errands|sort %}
      <tr><td>{{errand}}</td>
        <td>
  	<button type="button" class="btn-warning"

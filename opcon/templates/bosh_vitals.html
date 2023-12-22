@@ -17,7 +17,7 @@
     <div class="form-row">
       <div class="form-group col-md-6">
 	   <select class="form-control" id="deployment_list" name="deployment">
-	     {% for d in deployments %}
+	     {% for d in deployments|sort %}
 	     {% if deployment_name == d %}
 	     <option selected> {{ d }}</option>
 	     {% else %}

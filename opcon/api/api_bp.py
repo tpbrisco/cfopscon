@@ -59,6 +59,7 @@ def v1_callback():
                                 "message": "logged as {}".format(username)}),
                     status=200, content_type='application/json; charset=UTF-8')
 
+
 # v1/tasks - return list of previous tasks
 @api_bp.route('/v1/tasks')
 def v1_tasks():

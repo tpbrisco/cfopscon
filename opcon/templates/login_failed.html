@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Login Failure{% endblock %}
+{% block content %}
+<div class="col-md-8 offset-md-2">
+  <h1>Login Failure</h1>
+      {% for key, value in fail_args.items() %}
+      <p>{{key}}: {{value}}</p>
+      {% endfor %}
+</div>
+{% endblock %}

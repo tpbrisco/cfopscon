@@ -114,7 +114,9 @@ def login_callback():
     code = request.args.get("code")
     if not code:
         print("got callback with no code")
-        return Response('code is missing', 401)
+        # return all arguments for failing callback
+        return render_template("login_failed.html", fail_args=request.args)
+#        return Response('code is missing', 401)
     # have auth code, next link - get token, and redirect there
     token_url, headers, body = user_auth.ua_lib.prepare_token_request(code)
     token_r = requests.post(

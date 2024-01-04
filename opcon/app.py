@@ -22,6 +22,7 @@ import os
 import sys
 import time
 import json
+import re
 
 # set up primary objects
 app = Flask(__name__)
@@ -77,6 +78,11 @@ if config.get('o_audit_enable'):
 @app.template_filter('datetime')
 def format_datetime(value):
     return time.ctime(value)
+
+
+@app.template_filter('regex_replace')
+def regex_replace(s, find, replace):
+    return re.sub(find, replace, s)
 
 
 @app.route("/index.html")

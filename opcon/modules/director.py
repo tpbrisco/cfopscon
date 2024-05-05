@@ -122,7 +122,7 @@ class Director(object):
             auth=('bosh_cli', ''),
             verify=self.verify_tls)
         if not r.ok:
-            print(f"oauth request({r.status_code}) {r.content}")
+            print(f"director login: oauth request({r.status_code}) {r.content}")
             sys.exit(1)
         j = r.json()
         self.oauth = j.copy()

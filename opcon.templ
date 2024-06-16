@@ -1,0 +1,24 @@
+# envsubst < opcon.templ
+[bosh]
+director_url=https://${DIRECTOR_IPADDRESS}:25555
+verify_tls=False
+user=admin
+pass=${BOSH_ADMIN_PASSWORD}
+debug=True
+readonly=False
+[auth]
+type=MOD
+data=${AUTH_MOD_DATA}
+module=${AUTH_MOD}
+brand=${AUTH_BRAND}
+debug=False
+# [errands_<deployment>]
+# allow=["^status$"]
+# [errands_*]
+[audit]
+enable=${AUDIT_ENABLE}
+data=opcon,audit,username,password,url
+extra_fields={"custom_field": "custom_value"}
+[api]
+enable=False
+debug=False

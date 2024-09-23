@@ -51,7 +51,7 @@
       <td>{{ inst.vitals.mem.percent }}%</td>
       <td>{{ inst.vitals.swap.percent }}%</td>
       <td>{{ inst.resurrection_paused }}</td>
-      <td>{{ inst.job_state }} ({{ inst.processes |length}} procs)</td>
+      <td>{{ inst.job_state }}</td>
       {% if readonly == False %}
       <td>
 	<button type="button" class="btn-warning"

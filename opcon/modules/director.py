@@ -152,7 +152,33 @@ class Director(object):
             print("error getting deployments: ", d_r.content)
             self.deployments = list()
 
-    def get_deployment_jobs(self, deployment):
+    def add_job_wildcards(self, jobs):
+        '''Enrich the list of deployment jobs with wildcards'''
+        # a list like
+        #   api/<guid1>
+        #   diego_cell/<guid2>
+        #   diego_cell/<guid3>
+        # becomes
+        #   api/<guid1>
+        #   diego_cell/*
+        #   diego_cell/<guid2>
+        #   diego_cell/<guid3>
+        #
+        job_groups = dict()
+        for j in jobs:
+            group = j.split('/')[0]
+            if group not in job_groups:
+                job_groups[group] = list()
+            job_groups[group].append(j)
+        # should have a full dictionary of the job groups now, with jobs listed in it
+        r_jobs = list()
+        for g in sorted(job_groups.keys()):  # maintain sorting
+            if len(job_groups[g]) > 1:
+                r_jobs.append(g + "/*")
+            r_jobs.extend(job_groups[g])
+        return r_jobs
+
+    def get_deployment_jobs(self, deployment, groups=False):
         '''return a list of jobs associated with this deployment'''
         j_r = self.session.get(self.bosh_url + "/deployments/" + deployment + "/vms",
                                params={
@@ -160,10 +186,12 @@ class Director(object):
                                    'exclude_releases': True,
                                    'exclude_stemcells': True},
                                verify=self.verify_tls)
-        r = list()
         if j_r.ok:
-            for j in j_r.json():
+            r = list()
+            for j in sorted(j_r.json(), key=lambda k: k['job']):
                 r.append("{}/{}".format(j['job'], j['id']))
+            if groups:
+                r = self.add_job_wildcards(r)
             return r
         else:
             return list()

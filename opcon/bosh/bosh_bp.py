@@ -30,18 +30,7 @@ def bosh_logs():
     if deployment == '' or deployment is None:
         deployment = director.deployments[0]
     # from a list of job/guid - include job and job/guid
-    jobs = sorted(director.get_deployment_jobs(deployment))
-    last_job = None
-    job_list = list()
-    for job in jobs:
-        if last_job is None or not job.startswith(last_job):
-            # if we have a new name prefix, then add it to the list
-            if '/' in job:
-                job_n = job.index('/')  # get name of job, without guid
-                last_job = job[:job_n]
-                # job/* will get the logs for all instances of that job
-                job_list.append(last_job + '/*')
-        job_list.append(job)
+    jobs = sorted(director.get_deployment_jobs(deployment, groups=True))
 
     best_response = request.accept_mimetypes.best_match(["application/json",
                                                          "text/html"])
@@ -50,7 +39,7 @@ def bosh_logs():
                                form=boshforms.BoshLogsForm(),
                                deployment_name=deployment,
                                deployments=director.deployments,
-                               jobs=job_list,
+                               jobs=jobs,
                                tasks=director.pending_tasks)
     return jsonify(director.pending_tasks)
 
@@ -185,7 +174,8 @@ def get_deployment_vitals_default():
 @accesslog.log_access
 def get_deployment_jobs(deployment):
     director = current_app.config['DIRECTOR']
-    sorted_jobs = sorted(director.get_deployment_jobs(deployment))
+    groups = request.args.get('groups', default=False, type=bool)
+    sorted_jobs = sorted(director.get_deployment_jobs(deployment, groups=groups))
     return Response(json.dumps(sorted_jobs),
                     content_type='application/json')
 

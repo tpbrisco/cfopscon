@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %} BOSH Tasks{% endblock %}
+{% block title %} BOSH Logs{% endblock %}
 {% block content %}
 <div class="col-md-8 offset-md-2">
   <h1>Fetch BOSH logs</h1>
@@ -8,7 +8,7 @@
       <div class="form-row">
 	<div class="form-group col-md-6">
 	  {{ form.deployment.label }}
-	  <select class="form-control"  id="deployment_list" name="deployment">
+	  <select class="form-control"  id="instance_group" name="deployment">
 	    {% for d in deployments|sort %}
 	     {% if deployment_name == d %}
 	     <option selected> {{ d }}</option>
@@ -21,7 +21,6 @@
 	<div class="form-group col-md-6">
 	  {{ form.jobs.label }}
 	  <select class="form-control" id="deployment_jobs" name="jobs">
-	    <!-- {{ jobs }} -->
 	    {% for j in jobs|sort %}
 	    <option>{{ j }}</option>
 	    {% endfor %}

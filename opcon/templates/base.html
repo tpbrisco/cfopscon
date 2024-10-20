@@ -13,6 +13,17 @@
 	  })
       })
   })
+  $(document).ready(function() {
+      $("#instance_group").click(function(){
+	  $.get("/bosh/deployment/" + $("#instance_group").val() + "/jobs?groups=true", function(data, status){
+	      $("#deployment_jobs").empty("li");
+	      for (i=0; i< data.length; i++) {
+		  console.log($("#instance_group").val() + "[" + i + "] ->" + data[i])
+		  $("#deployment_jobs").append("<option>"+data[i]+"</option");
+	      }
+	  })
+      })
+  })
 </script>
 {{ super() }}
 {% endblock %}

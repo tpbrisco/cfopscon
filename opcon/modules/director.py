@@ -232,6 +232,8 @@ class Director(object):
     def get_logs_job(self, link):
         '''get download URL for a bosh logs command'''
         logs_t_r = self.task_wait_ready(link)
+        if logs_t_r.json()['state'] != 'done':
+            return None
         # get blobstore ID from 'result' field
         download_url = "/resources/{}".format(logs_t_r.json()['result'])
         if self.debug:
@@ -384,11 +386,14 @@ class Director(object):
         return ary_vms
 
     def task_wait_ready(self, task_url):
+        tries = 0
+        max_tries = 2   # ensure we return under the gunicorn TIMEOUT value
         task_r = self.session.get(self.bosh_url + task_url,
                                   verify=self.verify_tls)
         task_state = task_r.json()['state']
-        while task_state != 'done':
+        while task_state != 'done' and tries < max_tries:
             # should "flash" a message here
+            tries += 1
             if self.debug:
                 print("task state: sleep until job ready")
             time.sleep(1)

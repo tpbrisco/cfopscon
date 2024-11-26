@@ -71,6 +71,9 @@ def download_logs(taskid):
     filename = t.t_query.replace('/', '_').replace(' ', '_') + ".tgz"
     # director.pending_tasks.remove(t)
     download_url = director.get_logs_job("/tasks/{}".format(taskid))
+    if download_url is None:
+        print(f"Found task {taskid} not ready, wait")
+        return render_template('bosh_logerr.html', taskid=taskid)
     r = director.session.get(director.bosh_url + download_url,
                              verify=director.verify_tls,
                              stream=True)

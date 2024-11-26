@@ -41,7 +41,7 @@
 	<tr><td>{{ task.t_type }}</td><td>{{ task.t_query }}</td>
 	  <td>{{task.t_time |datetime }}</td><td>{{ task.t_url }}</td>
 	  {% set t_url = task.t_url |regex_replace("^/", "") %}
-	  <td><a href="/bosh/{{ t_url }}" download="{{task.t_url|replace('/','')}}.tar.gz">fetch</a></tr>
+	  <td><a href="/bosh/{{ t_url }}" target="_blank">fetch</a></tr>
 	{% endfor %}
      </tbody>
     </table>

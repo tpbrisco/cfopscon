@@ -137,8 +137,8 @@ should yield predictable results.
 - improve bosh tasks/errands output collection - auto-refresh events/debug output?
 - allow errand flags (e.g. specify the instance)
 - remove passwords from INI file
-- Investigate and support bosh-cli-like syntax "bosh logs compute" for
-  logs from all "compute" jobs.
+- ~~Investigate and support bosh-cli-like syntax "bosh logs compute" for
+  logs from all "compute" jobs.~~(See commit 17fcc2b)
 - "flash" updates on the status of things in wait;  E.g. waiting on a
   job to complete for logs download - put a status update.
   Presumably jQuery, and use the /deployments/:deployment/instances API~~

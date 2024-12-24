@@ -62,7 +62,11 @@ class AuditLog(object):
         log_list = [log_dict]
         if self.debug:
             print("send to ", self.url, type(jobj), json.dumps(log_list))
-        r = self.session.post(self.url, json=log_list)
+        try:
+            r = self.session.post(self.url, json=log_list)
+        except requests.exceptions.RequestException as e:
+            print(f"audit log fail: {e}")
+            return
         if not r.ok:
             print("audit log post failed", r.status_code, r.content)
             self.active = False

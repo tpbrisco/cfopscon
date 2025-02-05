@@ -66,6 +66,7 @@ class AuditLog(object):
             r = self.session.post(self.url, json=log_list)
         except requests.exceptions.RequestException as e:
             print(f"audit log fail: {e}")
+            self.active = False
             return
         if not r.ok:
             print("audit log post failed", r.status_code, r.content)

@@ -16,6 +16,7 @@ class config(object):
                 g = configini['bosh']
                 self.config['o_debug'] = g.getboolean('debug', fallback=False)
                 self.config['o_director_url'] = g.get('director_url')
+                self.config['o_director_timeo'] = g.getint('timeo', fallback=30)
                 self.config['o_verify_tls'] = g.getboolean('verify_tls',
                                                            fallback=True)
                 self.config['o_testing'] = g.getboolean('testing', fallback=False)

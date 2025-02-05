@@ -38,6 +38,8 @@ class Director(object):
         self.readonly = False
         if 'testing' in kwargs:
             self.testing = kwargs['testing']
+        if 'timeo' in kwargs:
+            self.timeo = kwargs['timeo']
         if 'debug' in kwargs:
             self.debug = kwargs['debug']
         if 'verify_tls' in kwargs:
@@ -387,16 +389,19 @@ class Director(object):
 
     def task_wait_ready(self, task_url):
         tries = 0
-        max_tries = 2   # ensure we return under the gunicorn TIMEOUT value
+        sleep_time = 2;
+        max_tries = ( self.timeo / sleep_time) - 1   # ensure we return under the gunicorn TIMEOUT value
         task_r = self.session.get(self.bosh_url + task_url,
                                   verify=self.verify_tls)
         task_state = task_r.json()['state']
+        if self.debug:
+            print(f"waiting on task for {sleep_time} as many as {self.timeo} times")
         while task_state != 'done' and tries < max_tries:
             # should "flash" a message here
             tries += 1
             if self.debug:
-                print("task state: sleep until job ready")
-            time.sleep(1)
+                print(f"task state: sleep({sleep_time})x{tries} until job ready")
+            time.sleep(sleep_time)
             task_r = self.session.get(self.bosh_url + task_url,
                                       verify=self.verify_tls)
             task_state = task_r.json()['state']

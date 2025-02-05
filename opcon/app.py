@@ -55,6 +55,7 @@ user_auth.ua_login_manager.login_view = 'login'
 director = director.Director(config.get('o_director_url'),
                              config.get('o_bosh_user'),
                              config.get('o_bosh_pass'),
+                             timeo=config.get('o_director_timeo'),
                              debug=config.get('o_debug'),
                              testing=config.get('o_testing'),
                              verify_tls=config.get('o_verify_tls'),

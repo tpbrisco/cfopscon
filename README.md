@@ -61,6 +61,7 @@ Options are specified below, with any default value indicated first.
 - pass=[_magic_, $BOSH_PASSWORD] -- password for the BOSH login
 - debug=[False, True] -- disable/enable debugging for the director code
 - readonly=[False, True] -- disable certain BOSH operations
+- timeo=[int] -- max wait time for API calls, default 30 (see gunicorn.py $TIMEOUT)
 
 The _readonly_ flag disables start/stop/recreate operations on BOSH
 VMs.  Note that this does not disable errands (see below).
